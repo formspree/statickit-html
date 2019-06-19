@@ -1,1 +1,5 @@
-console.log("Hello world!");
+const ready = require('./ready');
+
+ready(() => {
+  console.log("Hello world")
+});
