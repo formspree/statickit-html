@@ -1,5 +1,6 @@
-const ready = require('./ready');
+const ready = require("./ready");
+const forms = require("./forms");
 
 ready(() => {
-  console.log("Hello world")
+  forms.init();
 });
