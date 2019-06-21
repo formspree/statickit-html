@@ -8,23 +8,23 @@ const logger = require("./logger")("forms");
  * Gets all `<form>` elements that are under StaticKit control.
  */
 const getForms = document => {
-  return Array.from(document.forms).filter(formEl => {
-    return getFormId(formEl) !== undefined;
+  return Array.from(document.forms).filter(form => {
+    return getFormId(form) !== undefined;
   });
 };
 
 /**
  * Gets the SK ID from a `<form>` element.
  */
-const getFormId = formEl => {
-  return formEl.dataset.skId;
+const getFormId = form => {
+  return form.dataset.skId;
 };
 
 /**
  * Disables all submit buttons in a form.
  */
-const disable = formEl => {
-  Array.from(formEl.querySelectorAll("[type='submit']:enabled")).forEach(
+const disable = form => {
+  Array.from(form.querySelectorAll("[type='submit']:enabled")).forEach(
     buttonEl => {
       buttonEl.disabled = true;
       buttonEl.skWasEnabled = true;
@@ -35,8 +35,8 @@ const disable = formEl => {
 /**
  * Enables all submit buttons in a form.
  */
-const enable = formEl => {
-  Array.from(formEl.querySelectorAll("[type='submit']:disabled")).forEach(
+const enable = form => {
+  Array.from(form.querySelectorAll("[type='submit']:disabled")).forEach(
     buttonEl => {
       if (buttonEl.skWasEnabled) {
         buttonEl.disabled = false;
@@ -48,8 +48,8 @@ const enable = formEl => {
 /**
  * Clears validation errors.
  */
-const clearErrors = formEl => {
-  Array.from(formEl.querySelectorAll("[data-sk-errors]")).forEach(el => {
+const clearErrors = form => {
+  Array.from(form.querySelectorAll("[data-sk-errors]")).forEach(el => {
     el.innerHTML = "";
   });
 };
@@ -57,29 +57,30 @@ const clearErrors = formEl => {
 /**
  * Submits the form.
  */
-const submit = formEl => {
-  const id = getFormId(formEl);
+const submit = form => {
+  const id = getFormId(form);
   const url = STATICKIT_URL + "/j/forms/" + id + "/submissions";
 
-  disable(formEl);
+  disable(form);
+  clearErrors(form);
 
-  logger.log(id, "Submitting form");
+  logger.log(id, "Submitting");
 
   fetch(url, {
     method: "POST",
     mode: "cors",
-    body: new FormData(formEl)
+    body: new FormData(form)
   })
     .then(response => {
       if (response.status == 200) {
         return response.json().then(data => {
-          logger.log(id, "Submission succeeded");
-          enable(formEl);
+          logger.log(id, "Submitted", data);
+          enable(form);
         });
       } else {
         return response.json().then(data => {
-          logger.log(id, "Submission failed", data);
-          enable(formEl);
+          logger.log(id, "Errored", data);
+          enable(form);
         });
       }
     })
@@ -89,10 +90,10 @@ const submit = formEl => {
 /**
  * Hijacks form submission.
  */
-const setupForm = formEl => {
-  formEl.addEventListener("submit", ev => {
+const setupForm = form => {
+  form.addEventListener("submit", ev => {
     ev.preventDefault();
-    submit(formEl);
+    submit(form);
   });
 };
 
