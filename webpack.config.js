@@ -30,7 +30,7 @@ module.exports = env => {
       new webpack.DefinePlugin({
         PRODUCTION: JSON.stringify(env.production),
         STATICKIT_URL: env.production
-          ? JSON.stringify("https://f.statickit.com")
+          ? JSON.stringify("https://api.statickit.com")
           : JSON.stringify("http://localhost:4000")
       })
     ]

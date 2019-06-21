@@ -9,14 +9,14 @@ const logger = require("./logger")("forms");
  */
 const getForms = document => {
   return Array.from(document.forms).filter(form => {
-    return getFormId(form) !== undefined;
+    return getId(form) !== undefined;
   });
 };
 
 /**
- * Gets the SK ID from a `<form>` element.
+ * Gets the id from a `<form>` element.
  */
-const getFormId = form => {
+const getId = form => {
   return form.dataset.skId;
 };
 
@@ -58,7 +58,7 @@ const clearErrors = form => {
  * Submits the form.
  */
 const submit = form => {
-  const id = getFormId(form);
+  const id = getId(form);
   const url = STATICKIT_URL + "/j/forms/" + id + "/submissions";
 
   disable(form);
@@ -72,25 +72,28 @@ const submit = form => {
     body: new FormData(form)
   })
     .then(response => {
-      if (response.status == 200) {
-        return response.json().then(data => {
-          logger.log(id, "Submitted", data);
-          enable(form);
-        });
-      } else {
-        return response.json().then(data => {
-          logger.log(id, "Errored", data);
-          enable(form);
-        });
-      }
+      response.json().then(data => {
+        switch (response.status) {
+          case 200:
+            logger.log(id, "Submitted", data);
+            break;
+
+          default:
+            logger.log(id, "Validation error", data);
+            break;
+        }
+      });
     })
-    .catch(error => logger.log("Error: ", error));
+    .catch(error => logger.log(id, "Unexpected error ", error))
+    .finally(() => {
+      enable(form);
+    });
 };
 
 /**
  * Hijacks form submission.
  */
-const setupForm = form => {
+const setup = form => {
   form.addEventListener("submit", ev => {
     ev.preventDefault();
     submit(form);
@@ -100,6 +103,6 @@ const setupForm = form => {
 module.exports = {
   init: () => {
     logger.log("Initializing forms");
-    return getForms(window.document).map(setupForm);
+    return getForms(window.document).map(setup);
   }
 };
