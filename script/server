@@ -4,4 +4,4 @@
 
 set -e
 
-npm run server
+now dev

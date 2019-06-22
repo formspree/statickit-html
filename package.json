@@ -6,7 +6,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "webpack --mode production --env.production",
-    "server": "node server.js",
+    "now-build": "webpack --mode production --env.production",
     "prettier": "npx prettier --write 'src/**/*.js'"
   },
   "author": "Derrick Reimer",
@@ -18,8 +18,6 @@
     "babel-loader": "^8.0.6",
     "prettier": "1.18.2",
     "webpack": "^4.34.0",
-    "webpack-cli": "^3.3.4",
-    "webpack-dev-middleware": "^3.7.0",
-    "webpack-dev-server": "^3.7.2"
+    "webpack-cli": "^3.3.4"
   }
 }

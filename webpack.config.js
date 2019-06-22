@@ -1,7 +1,8 @@
 const path = require("path");
 const webpack = require("webpack");
+const staticKitUrl = process.env.STATICKIT_URL || "https://api.statickit.com";
 
-module.exports = env => {
+module.exports = (env = {}) => {
   return {
     mode: "development",
     entry: {
@@ -9,8 +10,7 @@ module.exports = env => {
     },
     output: {
       path: path.resolve(__dirname, "dist"),
-      filename: "statickit.js",
-      publicPath: "/" // used by webpack-dev-middleware
+      filename: "statickit.js"
     },
     module: {
       rules: [
@@ -29,9 +29,7 @@ module.exports = env => {
     plugins: [
       new webpack.DefinePlugin({
         PRODUCTION: JSON.stringify(env.production),
-        STATICKIT_URL: env.production
-          ? JSON.stringify("https://api.statickit.com")
-          : JSON.stringify("http://localhost:4000")
+        STATICKIT_URL: JSON.stringify(staticKitUrl)
       })
     ]
   };

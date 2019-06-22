@@ -1,0 +1,13 @@
+{
+  "name": "statickit-js",
+  "version": 2,
+  "scope": "statickit",
+  "builds": [{ "src": "package.json", "use": "@now/static-build" }],
+  "routes": [
+    {
+      "src": "/statickit.js",
+      "headers": { "cache-control": "maxage=1800" },
+      "dest": "/statickit.js"
+    }
+  ]
+}
