@@ -6,7 +6,7 @@
   "routes": [
     {
       "src": "/statickit.js",
-      "headers": { "cache-control": "maxage=1800" },
+      "headers": { "cache-control": "maxage=300" },
       "dest": "/statickit.js"
     }
   ]
