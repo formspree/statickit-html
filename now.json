@@ -10,5 +10,10 @@
       "headers": { "cache-control": "maxage=300" },
       "dest": "/statickit.js"
     }
-  ]
+  ],
+  "build": {
+    "env": {
+      "NODE_ENV": "production"
+    }
+  }
 }

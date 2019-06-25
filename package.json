@@ -5,8 +5,8 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "webpack --mode production --env.production",
-    "now-build": "webpack --mode production --env.production",
+    "build": "webpack",
+    "now-build": "webpack",
     "prettier": "npx prettier --write 'src/**/*.js'"
   },
   "author": "Derrick Reimer",

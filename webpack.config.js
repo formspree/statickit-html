@@ -1,10 +1,12 @@
 const path = require("path");
 const webpack = require("webpack");
 const staticKitUrl = process.env.STATICKIT_URL || "https://api.statickit.com";
+const nodeEnv = process.env.NODE_ENV || "production";
+const mode = nodeEnv;
 
 module.exports = (env = {}) => {
   return {
-    mode: "development",
+    mode: mode,
     entry: {
       main: "./src/index.js"
     },
@@ -28,7 +30,7 @@ module.exports = (env = {}) => {
     },
     plugins: [
       new webpack.DefinePlugin({
-        PRODUCTION: JSON.stringify(env.production),
+        PRODUCTION: JSON.stringify(nodeEnv == "production"),
         STATICKIT_URL: JSON.stringify(staticKitUrl)
       })
     ]
