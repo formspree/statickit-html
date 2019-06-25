@@ -1,6 +1,7 @@
 {
   "name": "statickit-js",
   "version": 2,
+  "alias": "js.statickit.com",
   "scope": "statickit",
   "builds": [{ "src": "package.json", "use": "@now/static-build" }],
   "routes": [
