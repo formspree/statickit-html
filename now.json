@@ -3,18 +3,21 @@
   "version": 2,
   "alias": "js.statickit.com",
   "scope": "statickit",
-  "builds": [{ "src": "package.json", "use": "@now/static-build" }],
+  "builds": [
+    {
+      "src": "package.json",
+      "use": "@now/static-build",
+      "env": {
+        "NODE_ENV": "production",
+        "STATICKIT_URL": "https://api.statickit.com"
+      }
+    }
+  ],
   "routes": [
     {
       "src": "/statickit.js",
       "headers": { "cache-control": "maxage=300" },
       "dest": "/statickit.js"
     }
-  ],
-  "build": {
-    "env": {
-      "NODE_ENV": "production",
-      "STATICKIT_URL": "https://api.statickit.com"
-    }
-  }
+  ]
 }

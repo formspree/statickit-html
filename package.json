@@ -8,8 +8,8 @@
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "npx webpack",
-    "now-build": "npx webpack",
+    "build": "webpack",
+    "now-build": "webpack",
     "prettier": "npx prettier --write 'src/**/*.js'"
   },
   "author": "Derrick Reimer",
