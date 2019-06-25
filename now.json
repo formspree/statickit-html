@@ -6,11 +6,7 @@
   "builds": [
     {
       "src": "package.json",
-      "use": "@now/static-build",
-      "env": {
-        "NODE_ENV": "production",
-        "STATICKIT_URL": "https://api.statickit.com"
-      }
+      "use": "@now/static-build"
     }
   ],
   "routes": [
