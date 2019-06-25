@@ -4,7 +4,7 @@
   "description": "The JavaScript client for StaticKit",
   "main": "index.js",
   "engines": {
-    "node": "~12.2.0"
+    "node": "~10.16.0"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
