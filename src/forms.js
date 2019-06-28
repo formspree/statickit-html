@@ -88,6 +88,12 @@ const setup = (form, props) => {
     ev.preventDefault();
     submit(form, props);
   });
+
+  Array.from(form.querySelectorAll("[type='submit']:disabled")).forEach(
+    buttonEl => {
+      buttonEl.disabled = false;
+    }
+  );
 };
 
 module.exports = {
