@@ -3,22 +3,7 @@
  */
 
 const logger = require("./logger")("forms");
-
-/**
- * Gets all `<form>` elements that are under StaticKit control.
- */
-const getForms = document => {
-  return Array.from(document.forms).filter(form => {
-    return getId(form) !== undefined;
-  });
-};
-
-/**
- * Gets the id from a `<form>` element.
- */
-const getId = form => {
-  return form.dataset.skId;
-};
+const h = require("hyperscript");
 
 /**
  * Disables all submit buttons in a form.
@@ -57,8 +42,8 @@ const clearErrors = form => {
 /**
  * Submits the form.
  */
-const submit = form => {
-  const id = getId(form);
+const submit = (form, props) => {
+  const id = props.id;
   const url = STATICKIT_URL + "/j/forms/" + id + "/submissions";
 
   disable(form);
@@ -76,6 +61,9 @@ const submit = form => {
         switch (response.status) {
           case 200:
             logger.log(id, "Submitted", data);
+            if (props.onSuccess) {
+              form.parentNode.replaceChild(props.onSuccess, form);
+            }
             break;
 
           default:
@@ -93,16 +81,29 @@ const submit = form => {
 /**
  * Hijacks form submission.
  */
-const setup = form => {
+const setup = (form, props) => {
+  logger.log(props.id, "Initializing");
+
   form.addEventListener("submit", ev => {
     ev.preventDefault();
-    submit(form);
+    submit(form, props);
   });
 };
 
 module.exports = {
-  init: () => {
-    logger.log("Initializing forms");
-    return getForms(window.document).map(setup);
+  init: (selector, propsFn) => {
+    const form = document.querySelector(selector);
+
+    if (!form) {
+      logger.log("Element `" + selector + "` not found");
+      return;
+    }
+
+    if (typeof propsFn !== "function") {
+      logger.log("`props` must be a function");
+      return;
+    }
+
+    return setup(form, propsFn.call(this, h));
   }
 };
