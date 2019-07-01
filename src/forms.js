@@ -6,48 +6,69 @@ const logger = require("./logger")("forms");
 const h = require("hyperscript");
 
 /**
- * Disables all submit buttons in a form.
+ * Default configuration.
  */
-const disable = form => {
-  Array.from(form.querySelectorAll("[type='submit']:enabled")).forEach(
-    buttonEl => {
-      buttonEl.disabled = true;
-      buttonEl.skWasEnabled = true;
-    }
-  );
-};
+const defaults = {
+  h: h,
+  autoEnable: true,
+  onSuccess: (config, resp) => {
+    const h = config.h;
+    const replacement = h("div", {}, "Thank you for signing up!");
+    form.parentNode.replaceChild(replacement, form);
+  },
+  onError: (config, errors) => {
+    config.renderErrors(config, errors);
+  },
+  onSubmit: config => {
+    config.clearErrors(config);
+    config.disable(config);
+  },
+  enable: config => {
+    const form = config.form;
+    const buttons = form.querySelectorAll("[type='submit']:disabled");
 
-/**
- * Enables all submit buttons in a form.
- */
-const enable = form => {
-  Array.from(form.querySelectorAll("[type='submit']:disabled")).forEach(
-    buttonEl => {
-      if (buttonEl.skWasEnabled) {
-        buttonEl.disabled = false;
-      }
-    }
-  );
-};
+    Array.from(buttons).forEach(button => {
+      button.disabled = false;
+    });
+  },
+  disable: config => {
+    const form = config.form;
+    const buttons = form.querySelectorAll("[type='submit']:enabled");
 
-/**
- * Clears validation errors.
- */
-const clearErrors = form => {
-  Array.from(form.querySelectorAll("[data-sk-errors]")).forEach(el => {
-    el.innerHTML = "";
-  });
+    Array.from(buttons).forEach(button => {
+      button.disabled = true;
+    });
+  },
+  renderErrors: (config, errors) => {
+    const form = config.form;
+
+    errors.forEach(error => {
+      const selector = "[data-sk-error='" + error.attribute + "']";
+      const element = form.querySelector(selector);
+      if (!element) return;
+      element.innerHTML = error.message;
+    });
+  },
+  clearErrors: config => {
+    const form = config.form;
+    const selector = "[data-sk-error='" + error.attribute + "']";
+    const elements = form.querySelectorAll(selector);
+
+    Array.from(elements).forEach(element => {
+      element.innerHTML = "";
+    });
+  }
 };
 
 /**
  * Submits the form.
  */
-const submit = (form, props) => {
-  const id = props.id;
+const submit = config => {
+  const { id, form, enable, disable, renderErrors, onSuccess } = config;
   const url = STATICKIT_URL + "/j/forms/" + id + "/submissions";
 
-  disable(form);
-  clearErrors(form);
+  disable(config);
+  renderErrors(config, []);
 
   logger.log(id, "Submitting");
 
@@ -61,9 +82,7 @@ const submit = (form, props) => {
         switch (response.status) {
           case 200:
             logger.log(id, "Submitted", data);
-            if (props.onSuccess) {
-              form.parentNode.replaceChild(props.onSuccess, form);
-            }
+            onSuccess(config);
             break;
 
           default:
@@ -74,42 +93,41 @@ const submit = (form, props) => {
     })
     .catch(error => logger.log(id, "Unexpected error ", error))
     .finally(() => {
-      enable(form);
+      enable(config);
     });
 };
 
 /**
  * Hijacks form submission.
  */
-const setup = (form, props) => {
-  logger.log(props.id, "Initializing");
+const setup = config => {
+  const { id, form, autoEnable, enable } = config;
+
+  logger.log(id, "Initializing");
 
   form.addEventListener("submit", ev => {
     ev.preventDefault();
-    submit(form, props);
+    submit(config);
   });
 
-  Array.from(form.querySelectorAll("[type='submit']:disabled")).forEach(
-    buttonEl => {
-      buttonEl.disabled = false;
-    }
-  );
+  if (autoEnable) enable(config);
 };
 
 module.exports = {
-  init: (selector, propsFn) => {
+  init: (selector, props) => {
     const form = document.querySelector(selector);
+    const config = Object.assign(defaults, props, { form });
 
     if (!form) {
       logger.log("Element `" + selector + "` not found");
       return;
     }
 
-    if (typeof propsFn !== "function") {
-      logger.log("`props` must be a function");
+    if (!config.id) {
+      logger.log("You must define an `id` property");
       return;
     }
 
-    return setup(form, propsFn.call(this, h));
+    return setup(config);
   }
 };
