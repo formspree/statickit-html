@@ -24,7 +24,7 @@ const onSubmit = config => {
  * The default success callback.
  */
 const onSuccess = (config, resp) => {
-  const h = config.h;
+  const { h, form } = config;
   const replacement = h("div", {}, "Thank you!");
   form.parentNode.replaceChild(replacement, form);
 };
