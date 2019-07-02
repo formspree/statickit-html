@@ -25,7 +25,7 @@ const onSubmit = config => {
  */
 const onSuccess = (config, resp) => {
   const h = config.h;
-  const replacement = h("div", {}, "Thank you for signing up!");
+  const replacement = h("div", {}, "Thank you!");
   form.parentNode.replaceChild(replacement, form);
 };
 
