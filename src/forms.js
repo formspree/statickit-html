@@ -6,69 +6,103 @@ const logger = require("./logger")("forms");
 const h = require("hyperscript");
 
 /**
- * Default configuration.
+ * The default init callback.
  */
-const defaults = {
-  h: h,
-  autoEnable: true,
-  onSuccess: (config, resp) => {
-    const h = config.h;
-    const replacement = h("div", {}, "Thank you for signing up!");
-    form.parentNode.replaceChild(replacement, form);
-  },
-  onError: (config, errors) => {
-    config.renderErrors(config, errors);
-  },
-  onSubmit: config => {
-    config.clearErrors(config);
-    config.disable(config);
-  },
-  enable: config => {
-    const form = config.form;
-    const buttons = form.querySelectorAll("[type='submit']:disabled");
+const onInit = config => {
+  config.enable(config);
+};
 
-    Array.from(buttons).forEach(button => {
-      button.disabled = false;
+/**
+ * The default submit callback.
+ */
+const onSubmit = config => {
+  config.renderErrors(config, []);
+  config.disable(config);
+};
+
+/**
+ * The default success callback.
+ */
+const onSuccess = (config, resp) => {
+  const h = config.h;
+  const replacement = h("div", {}, "Thank you for signing up!");
+  form.parentNode.replaceChild(replacement, form);
+};
+
+/**
+ * The default error callback.
+ */
+const onError = (config, errors) => {
+  config.renderErrors(config, errors);
+};
+
+/**
+ * The default failure callback.
+ */
+const onFailure = config => {};
+
+/**
+ * The default enable hook.
+ */
+const enable = config => {
+  const buttons = config.form.querySelectorAll("[type='submit']:disabled");
+
+  Array.from(buttons).forEach(button => {
+    button.disabled = false;
+  });
+};
+
+/**
+ * The default disable hook.
+ */
+const disable = config => {
+  const buttons = config.form.querySelectorAll("[type='submit']:enabled");
+
+  Array.from(buttons).forEach(button => {
+    button.disabled = true;
+  });
+};
+
+/**
+ * The default error rendering hook.
+ */
+const renderErrors = (config, errors) => {
+  const elements = config.form.querySelectorAll("[data-sk-error]");
+  const errorFor = field => {
+    return errors.find(error => {
+      return error.field == field;
     });
-  },
-  disable: config => {
-    const form = config.form;
-    const buttons = form.querySelectorAll("[type='submit']:enabled");
+  };
 
-    Array.from(buttons).forEach(button => {
-      button.disabled = true;
-    });
-  },
-  renderErrors: (config, errors) => {
-    const form = config.form;
+  Array.from(elements).forEach(element => {
+    const error = errorFor(element.dataset.skError);
 
-    errors.forEach(error => {
-      const selector = "[data-sk-error='" + error.attribute + "']";
-      const element = form.querySelector(selector);
-      if (!element) return;
-      element.innerHTML = error.message;
-    });
-  },
-  clearErrors: config => {
-    const form = config.form;
-    const selector = "[data-sk-error='" + error.attribute + "']";
-    const elements = form.querySelectorAll(selector);
-
-    Array.from(elements).forEach(element => {
+    if (error) {
+      element.innerHTML = "This field " + error.message;
+    } else {
       element.innerHTML = "";
-    });
-  }
+    }
+  });
 };
 
 /**
  * Submits the form.
  */
 const submit = config => {
-  const { id, form, enable, disable, renderErrors, onSuccess } = config;
+  const {
+    id,
+    form,
+    enable,
+    disable,
+    renderErrors,
+    onSubmit,
+    onSuccess,
+    onError
+  } = config;
+
   const url = STATICKIT_URL + "/j/forms/" + id + "/submissions";
 
-  disable(config);
-  renderErrors(config, []);
+  onSubmit(config);
 
   logger.log(id, "Submitting");
 
@@ -85,23 +119,53 @@ const submit = config => {
             onSuccess(config);
             break;
 
-          default:
+          case 422:
             logger.log(id, "Validation error", data);
+            onError(config, data.errors);
+            break;
+
+          default:
+            logger.log(id, "Unexpected error", data);
+            onFailure(config);
             break;
         }
+
+        return true;
       });
     })
-    .catch(error => logger.log(id, "Unexpected error ", error))
+    .catch(error => {
+      logger.log(id, "Unexpected error ", error);
+      onFailure(config);
+      return true;
+    })
     .finally(() => {
       enable(config);
+      return true;
     });
+
+  return true;
 };
 
 /**
- * Hijacks form submission.
+ * Default configuration.
+ */
+const defaults = {
+  h: h,
+  onInit: onInit,
+  onSubmit: onSubmit,
+  onSuccess: onSuccess,
+  onError: onError,
+  onFailure: onFailure,
+  enable: enable,
+  disable: disable,
+  renderErrors: renderErrors
+};
+
+/**
+ * Setup the form.
  */
 const setup = config => {
-  const { id, form, autoEnable, enable } = config;
+  const { id, form, autoEnable, enable, onInit } = config;
 
   logger.log(id, "Initializing");
 
@@ -110,7 +174,8 @@ const setup = config => {
     submit(config);
   });
 
-  if (autoEnable) enable(config);
+  onInit(config);
+  return true;
 };
 
 module.exports = {
