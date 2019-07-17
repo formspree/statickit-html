@@ -1,3 +1,3 @@
-# statickit.js
+# @statickit/standalone
 
-The JavaScript client library for StaticKit.
+The JavaScript standalone library for StaticKit.
