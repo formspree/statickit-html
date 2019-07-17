@@ -5,15 +5,15 @@
   "scope": "statickit",
   "builds": [
     {
-      "src": "package.json",
-      "use": "@now/static-build"
+      "src": "dist/**",
+      "use": "@now/static"
     }
   ],
   "routes": [
     {
       "src": "/statickit.js",
-      "headers": { "cache-control": "maxage=300" },
-      "dest": "/statickit.js"
+      "headers": { "cache-control": "public, max-age=300" },
+      "dest": "/dist/statickit.min.js"
     }
   ]
 }

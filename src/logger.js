@@ -1,8 +1,8 @@
 const buildTag = tag => {
-  return "[sk:" + tag + "]";
+  return '[sk:' + tag + ']';
 };
 
-module.exports = tag => ({
+export default tag => ({
   log: (...args) => {
     if (!PRODUCTION) console.log(buildTag(tag), ...args);
   },

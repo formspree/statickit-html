@@ -1,9 +1,5 @@
-/**
- * Module dependencies.
- */
-
-const logger = require("./logger")("forms");
-const h = require("hyperscript");
+import logger from './logger';
+import h from 'hyperscript';
 
 /**
  * The default init callback.
@@ -25,7 +21,7 @@ const onSubmit = config => {
  */
 const onSuccess = (config, resp) => {
   const { h, form } = config;
-  const replacement = h("div", {}, "Thank you!");
+  const replacement = h('div', {}, 'Thank you!');
   form.parentNode.replaceChild(replacement, form);
 };
 
@@ -67,7 +63,7 @@ const disable = config => {
  * The default error rendering hook.
  */
 const renderErrors = (config, errors) => {
-  const elements = config.form.querySelectorAll("[data-sk-error]");
+  const elements = config.form.querySelectorAll('[data-sk-error]');
   const errorFor = field => {
     return errors.find(error => {
       return error.field == field;
@@ -78,9 +74,9 @@ const renderErrors = (config, errors) => {
     const error = errorFor(element.dataset.skError);
 
     if (error) {
-      element.innerHTML = "This field " + error.message;
+      element.innerHTML = 'This field ' + error.message;
     } else {
-      element.innerHTML = "";
+      element.innerHTML = '';
     }
   });
 };
@@ -97,35 +93,36 @@ const submit = config => {
     renderErrors,
     onSubmit,
     onSuccess,
-    onError
+    onError,
+    endpoint
   } = config;
 
-  const url = STATICKIT_URL + "/j/forms/" + id + "/submissions";
+  const url = endpoint + '/j/forms/' + id + '/submissions';
 
   onSubmit(config);
 
-  logger.log(id, "Submitting");
+  logger('forms').log(id, 'Submitting');
 
   fetch(url, {
-    method: "POST",
-    mode: "cors",
+    method: 'POST',
+    mode: 'cors',
     body: new FormData(form)
   })
     .then(response => {
       response.json().then(data => {
         switch (response.status) {
           case 200:
-            logger.log(id, "Submitted", data);
+            logger('forms').log(id, 'Submitted', data);
             onSuccess(config);
             break;
 
           case 422:
-            logger.log(id, "Validation error", data);
+            logger('forms').log(id, 'Validation error', data);
             onError(config, data.errors);
             break;
 
           default:
-            logger.log(id, "Unexpected error", data);
+            logger('forms').log(id, 'Unexpected error', data);
             onFailure(config);
             break;
         }
@@ -134,7 +131,7 @@ const submit = config => {
       });
     })
     .catch(error => {
-      logger.log(id, "Unexpected error ", error);
+      logger('forms').log(id, 'Unexpected error ', error);
       onFailure(config);
       return true;
     })
@@ -158,7 +155,8 @@ const defaults = {
   onFailure: onFailure,
   enable: enable,
   disable: disable,
-  renderErrors: renderErrors
+  renderErrors: renderErrors,
+  endpoint: 'https://api.statickit.com'
 };
 
 /**
@@ -167,9 +165,9 @@ const defaults = {
 const setup = config => {
   const { id, form, autoEnable, enable, onInit } = config;
 
-  logger.log(id, "Initializing");
+  logger('forms').log(id, 'Initializing');
 
-  form.addEventListener("submit", ev => {
+  form.addEventListener('submit', ev => {
     ev.preventDefault();
     submit(config);
   });
@@ -178,21 +176,21 @@ const setup = config => {
   return true;
 };
 
-module.exports = {
-  init: (selector, props) => {
-    const form = document.querySelector(selector);
-    const config = Object.assign(defaults, props, { form });
+const init = (selector, props) => {
+  const form = document.querySelector(selector);
+  const config = Object.assign(defaults, props, { form });
 
-    if (!form) {
-      logger.log("Element `" + selector + "` not found");
-      return;
-    }
-
-    if (!config.id) {
-      logger.log("You must define an `id` property");
-      return;
-    }
-
-    return setup(config);
+  if (!form) {
+    logger('forms').log('Element `' + selector + '` not found');
+    return;
   }
+
+  if (!config.id) {
+    logger('forms').log('You must define an `id` property');
+    return;
+  }
+
+  return setup(config);
 };
+
+export default { init };

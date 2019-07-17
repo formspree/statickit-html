@@ -1,15 +1,16 @@
 {
-  "name": "statickit-js",
-  "version": "1.0.0",
+  "name": "@statickit/standalone",
+  "version": "1.0.0-beta.0",
   "description": "The JavaScript client for StaticKit",
-  "main": "index.js",
-  "engines": {
-    "node": "~10.16.0"
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/levelhq/statickit-standalone.git"
   },
+  "main": "dist/statickit.umd.js",
+  "module": "dist/statickit.esm.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "webpack",
-    "now-build": "webpack",
+    "build": "rollup -c",
     "prettier": "npx prettier --write 'src/**/*.js'"
   },
   "author": "Derrick Reimer",
@@ -18,10 +19,13 @@
     "@babel/cli": "^7.4.4",
     "@babel/core": "^7.4.5",
     "@babel/preset-env": "^7.4.5",
-    "babel-loader": "^8.0.6",
     "prettier": "1.18.2",
-    "webpack": "^4.34.0",
-    "webpack-cli": "^3.3.4"
+    "rollup": "1.17.0",
+    "rollup-plugin-babel": "4.3.3",
+    "rollup-plugin-commonjs": "10.0.1",
+    "rollup-plugin-node-resolve": "5.2.0",
+    "rollup-plugin-replace": "2.2.0",
+    "rollup-plugin-terser": "5.1.1"
   },
   "dependencies": {
     "hyperscript": "2.0.2"
