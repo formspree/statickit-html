@@ -12,7 +12,7 @@ npm install @statickit/standalone
 
 If you are not using an npm-based build pipeline, you can install using our CDN instead:
 
-```
+```html
 <script defer src="https://js.statickit.com/statickit.js"></script>
 ```
 
