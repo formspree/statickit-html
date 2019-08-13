@@ -1,4 +1,4 @@
-# @statickit/standalone
+# StaticKit Standalone
 
 The standalone JavaScript library for StaticKit.
 
