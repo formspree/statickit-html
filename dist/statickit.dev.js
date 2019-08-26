@@ -1552,20 +1552,31 @@ var statickit = (function () {
       id,
       form,
       enable,
-      disable,
-      renderErrors,
       onSubmit,
       onSuccess,
       onError,
-      endpoint
+      endpoint,
+      data
     } = config;
     const url = endpoint + '/j/forms/' + id + '/submissions';
+    const formData = new FormData(form); // Append data from config
+
+    if (typeof data === 'object') {
+      for (const prop in data) {
+        if (typeof data[prop] === 'function') {
+          formData.append(prop, data[prop].call(null, config));
+        } else {
+          formData.append(prop, data[prop]);
+        }
+      }
+    }
+
     onSubmit(config);
     logger('forms').log(id, 'Submitting');
     fetch(url, {
       method: 'POST',
       mode: 'cors',
-      body: new FormData(form)
+      body: formData
     }).then(response => {
       response.json().then(data => {
         switch (response.status) {
@@ -1610,7 +1621,8 @@ var statickit = (function () {
     enable: enable,
     disable: disable,
     renderErrors: renderErrors,
-    endpoint: 'https://api.statickit.com'
+    endpoint: 'https://api.statickit.com',
+    data: {}
   };
   /**
    * Setup the form.
@@ -1620,8 +1632,6 @@ var statickit = (function () {
     const {
       id,
       form,
-      autoEnable,
-      enable,
       onInit
     } = config;
     logger('forms').log(id, 'Initializing');
