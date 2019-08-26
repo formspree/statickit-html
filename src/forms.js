@@ -89,15 +89,26 @@ const submit = config => {
     id,
     form,
     enable,
-    disable,
-    renderErrors,
     onSubmit,
     onSuccess,
     onError,
-    endpoint
+    endpoint,
+    data
   } = config;
 
   const url = endpoint + '/j/forms/' + id + '/submissions';
+  const formData = new FormData(form);
+
+  // Append data from config
+  if (typeof data === 'object') {
+    for (const prop in data) {
+      if (typeof data[prop] === 'function') {
+        formData.append(prop, data[prop].call(null, config));
+      } else {
+        formData.append(prop, data[prop]);
+      }
+    }
+  }
 
   onSubmit(config);
 
@@ -106,7 +117,7 @@ const submit = config => {
   fetch(url, {
     method: 'POST',
     mode: 'cors',
-    body: new FormData(form)
+    body: formData
   })
     .then(response => {
       response.json().then(data => {
@@ -156,14 +167,15 @@ const defaults = {
   enable: enable,
   disable: disable,
   renderErrors: renderErrors,
-  endpoint: 'https://api.statickit.com'
+  endpoint: 'https://api.statickit.com',
+  data: {}
 };
 
 /**
  * Setup the form.
  */
 const setup = config => {
-  const { id, form, autoEnable, enable, onInit } = config;
+  const { id, form, onInit } = config;
 
   logger('forms').log(id, 'Initializing');
 
