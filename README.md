@@ -1,6 +1,6 @@
 # StaticKit Standalone
 
-The standalone JavaScript library for StaticKit.
+The standalone JavaScript library for [StaticKit](https://statickit.com).
 
 ## Getting Started
 
