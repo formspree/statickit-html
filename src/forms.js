@@ -1,5 +1,6 @@
 import logger from './logger';
 import h from 'hyperscript';
+import telemetry from './telemetry';
 
 /**
  * The default init callback.
@@ -109,6 +110,12 @@ const submit = config => {
       }
     }
   }
+
+  const telemetryData = Object.assign(telemetry.data(), {
+    submittedAt: 1 * new Date()
+  });
+
+  formData.append('_t', window.btoa(JSON.stringify(telemetryData)));
 
   onSubmit(config);
 

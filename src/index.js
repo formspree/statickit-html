@@ -1,6 +1,8 @@
 import ready from './ready';
-import forms from './forms';
 import logger from './logger';
+import forms from './forms';
+import telemetry from './telemetry';
+import './polyfills';
 
 const queue = window.sk ? window.sk.q : [];
 
@@ -10,16 +12,34 @@ const api = {
   }
 };
 
-const call = (methodName, ...args) => {
-  const method = api[methodName];
+const run = ([scope, ...args]) => {
+  const method = api[scope];
 
   if (!method) {
     logger('main').log('Method `' + handler + '` does not exist');
     return;
   }
 
-  return method.apply(undefined, args);
+  return method.apply(null, args);
 };
+
+telemetry.set('loadedAt', 1 * new Date());
+
+window.addEventListener('mousemove', () => {
+  telemetry.inc('mousemove');
+});
+
+window.addEventListener('keydown', () => {
+  telemetry.inc('keydown');
+});
+
+telemetry.set(
+  'webdriver',
+  navigator.webdriver ||
+    document.documentElement.getAttribute('webdriver') ||
+    !!window.callPhantom ||
+    !!window._phantom
+);
 
 window.sk =
   window.sk ||
@@ -28,8 +48,8 @@ window.sk =
   };
 
 ready(() => {
-  window.sk = call;
-  queue.forEach(([...args]) => call(...args));
+  window.sk = run;
+  queue.forEach(run);
 });
 
 export default window.sk;
