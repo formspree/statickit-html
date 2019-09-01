@@ -15,5 +15,8 @@
       "headers": { "cache-control": "public, max-age=300" },
       "dest": "/dist/statickit.min.js"
     }
-  ]
+  ],
+  "github": {
+    "enabled": true
+  }
 }
