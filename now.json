@@ -2,7 +2,7 @@
   "name": "statickit-js",
   "version": 2,
   "alias": "js.statickit.com",
-  "scope": "statickit",
+  "scope": "levelhq",
   "builds": [
     {
       "src": "dist/**",
