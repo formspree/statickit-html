@@ -1,4 +1,34 @@
-var ready = (fn => {
+function _typeof(obj) {
+  if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") {
+    _typeof = function (obj) {
+      return typeof obj;
+    };
+  } else {
+    _typeof = function (obj) {
+      return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj;
+    };
+  }
+
+  return _typeof(obj);
+}
+
+function _toArray(arr) {
+  return _arrayWithHoles(arr) || _iterableToArray(arr) || _nonIterableRest();
+}
+
+function _arrayWithHoles(arr) {
+  if (Array.isArray(arr)) return arr;
+}
+
+function _iterableToArray(iter) {
+  if (Symbol.iterator in Object(iter) || Object.prototype.toString.call(iter) === "[object Arguments]") return Array.from(iter);
+}
+
+function _nonIterableRest() {
+  throw new TypeError("Invalid attempt to destructure non-iterable instance");
+}
+
+var ready = (function (fn) {
   if (document.readyState != 'loading') {
     fn();
   } else if (document.addEventListener) {
@@ -8,6 +38,23 @@ var ready = (fn => {
       if (document.readyState != 'loading') fn();
     });
   }
+});
+
+var logger = (function (tag) {
+  return {
+    log: function log() {
+
+      for (var _len = arguments.length, args = new Array(_len), _key = 0; _key < _len; _key++) {
+        args[_key] = arguments[_key];
+      }
+    },
+    error: function error() {
+
+      for (var _len2 = arguments.length, args = new Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
+        args[_key2] = arguments[_key2];
+      }
+    }
+  };
 });
 
 function createCommonjsModule(fn, module) {
@@ -1439,25 +1486,25 @@ function isArray (arr) {
 
 window.__skt || (window.__skt = {});
 var telemetry = {
-  set: function (key, val) {
+  set: function set(key, val) {
     window.__skt[key] = val;
     return val;
   },
-  get: function (key, defaultValue) {
+  get: function get(key, defaultValue) {
     return window.__skt[key] || defaultValue;
   },
-  inc: function (key) {
-    let val = (window.__skt[key] || 0) + 1;
+  inc: function inc(key) {
+    var val = (window.__skt[key] || 0) + 1;
     window.__skt[key] = val;
     return val;
   },
-  data: function () {
+  data: function data() {
     return window.__skt;
   }
 };
 
-const toCamel = s => {
-  return s.replace(/([-_][a-z])/gi, $1 => {
+var toCamel = function toCamel(s) {
+  return s.replace(/([-_][a-z])/gi, function ($1) {
     return $1.toUpperCase().replace('-', '').replace('_', '');
   });
 };
@@ -1466,7 +1513,7 @@ const toCamel = s => {
  */
 
 
-const onInit = config => {
+var onInit = function onInit(config) {
   config.enable(config);
 };
 /**
@@ -1474,7 +1521,7 @@ const onInit = config => {
  */
 
 
-const onSubmit = config => {
+var onSubmit = function onSubmit(config) {
   config.renderErrors(config, []);
   config.disable(config);
 };
@@ -1483,12 +1530,10 @@ const onSubmit = config => {
  */
 
 
-const onSuccess = (config, resp) => {
-  const {
-    h,
-    form
-  } = config;
-  const replacement = h('div', {}, 'Thank you!');
+var onSuccess = function onSuccess(config, resp) {
+  var h = config.h,
+      form = config.form;
+  var replacement = h('div', {}, 'Thank you!');
   form.parentNode.replaceChild(replacement, form);
 };
 /**
@@ -1496,7 +1541,7 @@ const onSuccess = (config, resp) => {
  */
 
 
-const onError = (config, errors) => {
+var onError = function onError(config, errors) {
   config.renderErrors(config, errors);
 };
 /**
@@ -1504,15 +1549,15 @@ const onError = (config, errors) => {
  */
 
 
-const onFailure = config => {};
+var onFailure = function onFailure(config) {};
 /**
  * The default enable hook.
  */
 
 
-const enable = config => {
-  const buttons = config.form.querySelectorAll("[type='submit']:disabled");
-  Array.from(buttons).forEach(button => {
+var enable = function enable(config) {
+  var buttons = config.form.querySelectorAll("[type='submit']:disabled");
+  Array.from(buttons).forEach(function (button) {
     button.disabled = false;
   });
 };
@@ -1521,9 +1566,9 @@ const enable = config => {
  */
 
 
-const disable = config => {
-  const buttons = config.form.querySelectorAll("[type='submit']:enabled");
-  Array.from(buttons).forEach(button => {
+var disable = function disable(config) {
+  var buttons = config.form.querySelectorAll("[type='submit']:enabled");
+  Array.from(buttons).forEach(function (button) {
     button.disabled = true;
   });
 };
@@ -1532,28 +1577,28 @@ const disable = config => {
  */
 
 
-const renderErrors = (config, errors) => {
-  const elements = config.form.querySelectorAll('[data-sk-error]');
+var renderErrors = function renderErrors(config, errors) {
+  var elements = config.form.querySelectorAll('[data-sk-error]');
 
-  const errorFor = field => {
-    return errors.find(error => {
+  var errorFor = function errorFor(field) {
+    return errors.find(function (error) {
       return error.field == field;
     });
   };
 
-  Array.from(elements).forEach(element => {
-    const error = errorFor(element.dataset.skError);
+  Array.from(elements).forEach(function (element) {
+    var error = errorFor(element.dataset.skError);
 
     if (!error) {
       element.innerHTML = '';
       return;
     }
 
-    const fieldConfig = config.fields[error.field] || {};
-    const errorMessages = fieldConfig.errorMessages || {};
-    const prefix = fieldConfig.prettyName || 'This field';
-    const code = toCamel((error.code || '').toLowerCase());
-    const fullMessage = errorMessages[code] || `${prefix} ${error.message}`;
+    var fieldConfig = config.fields[error.field] || {};
+    var errorMessages = fieldConfig.errorMessages || {};
+    var prefix = fieldConfig.prettyName || 'This field';
+    var code = toCamel((error.code || '').toLowerCase());
+    var fullMessage = errorMessages[code] || "".concat(prefix, " ").concat(error.message);
     element.innerHTML = fullMessage;
   });
 };
@@ -1562,22 +1607,20 @@ const renderErrors = (config, errors) => {
  */
 
 
-const submit = config => {
-  const {
-    id,
-    form,
-    enable,
-    onSubmit,
-    onSuccess,
-    onError,
-    endpoint,
-    data
-  } = config;
-  const url = endpoint + '/j/forms/' + id + '/submissions';
-  const formData = new FormData(form); // Append data from config
+var submit = function submit(config) {
+  var id = config.id,
+      form = config.form,
+      enable = config.enable,
+      onSubmit = config.onSubmit,
+      onSuccess = config.onSuccess,
+      onError = config.onError,
+      endpoint = config.endpoint,
+      data = config.data;
+  var url = endpoint + '/j/forms/' + id + '/submissions';
+  var formData = new FormData(form); // Append data from config
 
-  if (typeof data === 'object') {
-    for (const prop in data) {
+  if (_typeof(data) === 'object') {
+    for (var prop in data) {
       if (typeof data[prop] === 'function') {
         formData.append(prop, data[prop].call(null, config));
       } else {
@@ -1586,35 +1629,40 @@ const submit = config => {
     }
   }
 
-  const telemetryData = Object.assign(telemetry.data(), {
+  var telemetryData = Object.assign(telemetry.data(), {
     submittedAt: 1 * new Date()
   });
   formData.append('_t', window.btoa(JSON.stringify(telemetryData)));
   onSubmit(config);
+  logger().log(id, 'Submitting');
   fetch(url, {
     method: 'POST',
     mode: 'cors',
     body: formData
-  }).then(response => {
-    response.json().then(data => {
+  }).then(function (response) {
+    response.json().then(function (data) {
       switch (response.status) {
         case 200:
+          logger().log(id, 'Submitted', data);
           onSuccess(config);
           break;
 
         case 422:
+          logger().log(id, 'Validation error', data);
           onError(config, data.errors);
           break;
 
         default:
+          logger().log(id, 'Unexpected error', data);
           break;
       }
 
       return true;
     });
-  }).catch(error => {
+  })["catch"](function (error) {
+    logger().log(id, 'Unexpected error ', error);
     return true;
-  }).finally(() => {
+  })["finally"](function () {
     enable(config);
     return true;
   });
@@ -1625,7 +1673,7 @@ const submit = config => {
  */
 
 
-const defaults = {
+var defaults = {
   h: hyperscript,
   onInit: onInit,
   onSubmit: onSubmit,
@@ -1643,13 +1691,12 @@ const defaults = {
  * Setup the form.
  */
 
-const setup = config => {
-  const {
-    id,
-    form,
-    onInit
-  } = config;
-  form.addEventListener('submit', ev => {
+var setup = function setup(config) {
+  var id = config.id,
+      form = config.form,
+      onInit = config.onInit;
+  logger().log(id, 'Initializing');
+  form.addEventListener('submit', function (ev) {
     ev.preventDefault();
     submit(config);
   });
@@ -1657,17 +1704,19 @@ const setup = config => {
   return true;
 };
 
-const init = (selector, props) => {
-  const form = document.querySelector(selector);
-  const config = Object.assign(defaults, props, {
-    form
+var init = function init(selector, props) {
+  var form = document.querySelector(selector);
+  var config = Object.assign(defaults, props, {
+    form: form
   });
 
   if (!form) {
+    logger().log('Element `' + selector + '` not found');
     return;
   }
 
   if (!config.id) {
+    logger().log('You must define an `id` property');
     return;
   }
 
@@ -1675,7 +1724,7 @@ const init = (selector, props) => {
 };
 
 var forms = {
-  init
+  init: init
 };
 
 if (typeof Object.assign !== 'function') {
@@ -1758,17 +1807,22 @@ if (typeof Object.assign !== 'function') {
   };
 })();
 
-const queue = window.sk ? window.sk.q : [];
-const api = {
-  form: (...args) => {
-    return forms.init(...args);
+var queue = window.sk ? window.sk.q : [];
+var api = {
+  form: function form() {
+    return forms.init.apply(forms, arguments);
   }
 };
 
-const run = ([scope, ...args]) => {
-  const method = api[scope];
+var run = function run(_ref) {
+  var _ref2 = _toArray(_ref),
+      scope = _ref2[0],
+      args = _ref2.slice(1);
+
+  var method = api[scope];
 
   if (!method) {
+    logger().log('Method `' + handler + '` does not exist');
     return;
   }
 
@@ -1776,10 +1830,10 @@ const run = ([scope, ...args]) => {
 };
 
 telemetry.set('loadedAt', 1 * new Date());
-window.addEventListener('mousemove', () => {
+window.addEventListener('mousemove', function () {
   telemetry.inc('mousemove');
 });
-window.addEventListener('keydown', () => {
+window.addEventListener('keydown', function () {
   telemetry.inc('keydown');
 });
 telemetry.set('webdriver', navigator.webdriver || document.documentElement.getAttribute('webdriver') || !!window.callPhantom || !!window._phantom);
@@ -1788,7 +1842,7 @@ window.sk = window.sk || function () {
   (sk.q = sk.q || []).push(arguments);
 };
 
-ready(() => {
+ready(function () {
   window.sk = run;
   queue.forEach(run);
 });
