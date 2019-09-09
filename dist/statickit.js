@@ -1459,9 +1459,15 @@ var statickit = (function () {
     }
   };
 
+  const toCamel = s => {
+    return s.replace(/([-_][a-z])/gi, $1 => {
+      return $1.toUpperCase().replace('-', '').replace('_', '');
+    });
+  };
   /**
    * The default init callback.
    */
+
 
   const onInit = config => {
     config.enable(config);
@@ -1541,11 +1547,17 @@ var statickit = (function () {
     Array.from(elements).forEach(element => {
       const error = errorFor(element.dataset.skError);
 
-      if (error) {
-        element.innerHTML = 'This field ' + error.message;
-      } else {
+      if (!error) {
         element.innerHTML = '';
+        return;
       }
+
+      const fieldConfig = config.fields[error.field] || {};
+      const errorMessages = fieldConfig.errorMessages || {};
+      const prefix = fieldConfig.prettyName || 'This field';
+      const code = toCamel((error.code || '').toLowerCase());
+      const fullMessage = errorMessages[code] || `${prefix} ${error.message}`;
+      element.innerHTML = fullMessage;
     });
   };
   /**
@@ -1627,7 +1639,8 @@ var statickit = (function () {
     disable: disable,
     renderErrors: renderErrors,
     endpoint: 'https://api.statickit.com',
-    data: {}
+    data: {},
+    fields: {}
   };
   /**
    * Setup the form.

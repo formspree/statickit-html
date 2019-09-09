@@ -2,6 +2,15 @@ import logger from './logger';
 import h from 'hyperscript';
 import telemetry from './telemetry';
 
+const toCamel = s => {
+  return s.replace(/([-_][a-z])/gi, $1 => {
+    return $1
+      .toUpperCase()
+      .replace('-', '')
+      .replace('_', '');
+  });
+};
+
 /**
  * The default init callback.
  */
@@ -65,6 +74,7 @@ const disable = config => {
  */
 const renderErrors = (config, errors) => {
   const elements = config.form.querySelectorAll('[data-sk-error]');
+
   const errorFor = field => {
     return errors.find(error => {
       return error.field == field;
@@ -74,11 +84,18 @@ const renderErrors = (config, errors) => {
   Array.from(elements).forEach(element => {
     const error = errorFor(element.dataset.skError);
 
-    if (error) {
-      element.innerHTML = 'This field ' + error.message;
-    } else {
+    if (!error) {
       element.innerHTML = '';
+      return;
     }
+
+    const fieldConfig = config.fields[error.field] || {};
+    const errorMessages = fieldConfig.errorMessages || {};
+    const prefix = fieldConfig.prettyName || 'This field';
+    const code = toCamel((error.code || '').toLowerCase());
+    const fullMessage = errorMessages[code] || `${prefix} ${error.message}`;
+
+    element.innerHTML = fullMessage;
   });
 };
 
@@ -175,7 +192,8 @@ const defaults = {
   disable: disable,
   renderErrors: renderErrors,
   endpoint: 'https://api.statickit.com',
-  data: {}
+  data: {},
+  fields: {}
 };
 
 /**
