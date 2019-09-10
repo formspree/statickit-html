@@ -1510,24 +1510,19 @@ var statickit = (function () {
    * The default init callback.
    */
 
-  var onInit = function onInit(config) {
-    config.enable(config);
-  };
+  var onInit = function onInit(_config) {};
   /**
    * The default submit callback.
    */
 
 
-  var onSubmit = function onSubmit(config) {
-    config.renderErrors(config, []);
-    config.disable(config);
-  };
+  var onSubmit = function onSubmit(_config) {};
   /**
    * The default success callback.
    */
 
 
-  var onSuccess = function onSuccess(config, resp) {
+  var onSuccess = function onSuccess(config, _resp) {
     var h = config.h,
         form = config.form;
     var replacement = h('div', {}, 'Thank you!');
@@ -1538,15 +1533,13 @@ var statickit = (function () {
    */
 
 
-  var onError = function onError(config, errors) {
-    config.renderErrors(config, errors);
-  };
+  var onError = function onError(_config, _errors) {};
   /**
    * The default failure callback.
    */
 
 
-  var onFailure = function onFailure(config) {};
+  var onFailure = function onFailure(_config) {};
   /**
    * The default enable hook.
    */
@@ -1608,6 +1601,8 @@ var statickit = (function () {
     var id = config.id,
         form = config.form,
         enable = config.enable,
+        disable = config.disable,
+        renderErrors = config.renderErrors,
         onSubmit = config.onSubmit,
         onSuccess = config.onSuccess,
         onError = config.onError,
@@ -1630,6 +1625,8 @@ var statickit = (function () {
       submittedAt: 1 * new Date()
     });
     formData.append('_t', window.btoa(JSON.stringify(telemetryData)));
+    renderErrors(config, []);
+    disable(config);
     onSubmit(config);
     logger('forms').log(id, 'Submitting');
     fetch(url, {
@@ -1646,6 +1643,7 @@ var statickit = (function () {
 
           case 422:
             logger('forms').log(id, 'Validation error', data);
+            renderErrors(config, data.errors);
             onError(config, data.errors);
             break;
 
@@ -1691,12 +1689,14 @@ var statickit = (function () {
   var setup = function setup(config) {
     var id = config.id,
         form = config.form,
-        onInit = config.onInit;
+        onInit = config.onInit,
+        enable = config.enable;
     logger('forms').log(id, 'Initializing');
     form.addEventListener('submit', function (ev) {
       ev.preventDefault();
       submit(config);
     });
+    enable(config);
     onInit(config);
     return true;
   };

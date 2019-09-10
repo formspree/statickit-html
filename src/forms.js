@@ -6,22 +6,17 @@ import { toCamel } from './utils';
 /**
  * The default init callback.
  */
-const onInit = config => {
-  config.enable(config);
-};
+const onInit = _config => {};
 
 /**
  * The default submit callback.
  */
-const onSubmit = config => {
-  config.renderErrors(config, []);
-  config.disable(config);
-};
+const onSubmit = _config => {};
 
 /**
  * The default success callback.
  */
-const onSuccess = (config, resp) => {
+const onSuccess = (config, _resp) => {
   const { h, form } = config;
   const replacement = h('div', {}, 'Thank you!');
   form.parentNode.replaceChild(replacement, form);
@@ -30,14 +25,12 @@ const onSuccess = (config, resp) => {
 /**
  * The default error callback.
  */
-const onError = (config, errors) => {
-  config.renderErrors(config, errors);
-};
+const onError = (_config, _errors) => {};
 
 /**
  * The default failure callback.
  */
-const onFailure = config => {};
+const onFailure = _config => {};
 
 /**
  * The default enable hook.
@@ -99,6 +92,8 @@ const submit = config => {
     id,
     form,
     enable,
+    disable,
+    renderErrors,
     onSubmit,
     onSuccess,
     onError,
@@ -126,6 +121,8 @@ const submit = config => {
 
   formData.append('_t', window.btoa(JSON.stringify(telemetryData)));
 
+  renderErrors(config, []);
+  disable(config);
   onSubmit(config);
 
   logger('forms').log(id, 'Submitting');
@@ -145,6 +142,7 @@ const submit = config => {
 
           case 422:
             logger('forms').log(id, 'Validation error', data);
+            renderErrors(config, data.errors);
             onError(config, data.errors);
             break;
 
@@ -192,7 +190,7 @@ const defaults = {
  * Setup the form.
  */
 const setup = config => {
-  const { id, form, onInit } = config;
+  const { id, form, onInit, enable } = config;
 
   logger('forms').log(id, 'Initializing');
 
@@ -201,6 +199,7 @@ const setup = config => {
     submit(config);
   });
 
+  enable(config);
   onInit(config);
   return true;
 };

@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.0-beta.4
+
+- [Feature] Make it less dangerous to override lifecycle callbacks by re-arranging how default behaviors are run.
+
 ## 1.0.0-beta.3
 
 - [Bug Fix] Fix argument destructuring that broke after Babel transpiling
