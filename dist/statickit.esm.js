@@ -1492,10 +1492,10 @@ var toCamel = function toCamel(s) {
     return $1.toUpperCase().replace('-', '').replace('_', '');
   });
 };
+
 /**
  * The default init callback.
  */
-
 
 var onInit = function onInit(config) {
   config.enable(config);
