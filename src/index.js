@@ -12,9 +12,7 @@ const api = {
   }
 };
 
-const run = (...args) => {
-  const scope = args[0];
-  const methodArgs = args.slice(1);
+const run = (scope, ...args) => {
   const method = api[scope];
 
   if (!method) {
@@ -22,7 +20,7 @@ const run = (...args) => {
     return;
   }
 
-  return method.apply(null, methodArgs);
+  return method.apply(null, args);
 };
 
 telemetry.set('loadedAt', 1 * new Date());
@@ -51,7 +49,9 @@ window.sk =
 
 ready(() => {
   window.sk = run;
-  queue.forEach(run);
+  queue.forEach(args => {
+    run.apply(null, args);
+  });
 });
 
 export default window.sk;

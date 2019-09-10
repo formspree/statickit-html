@@ -1811,13 +1811,7 @@ var statickit = (function () {
     }
   };
 
-  var run = function run() {
-    for (var _len = arguments.length, args = new Array(_len), _key = 0; _key < _len; _key++) {
-      args[_key] = arguments[_key];
-    }
-
-    var scope = args[0];
-    var methodArgs = args.slice(1);
+  var run = function run(scope) {
     var method = api[scope];
 
     if (!method) {
@@ -1825,7 +1819,11 @@ var statickit = (function () {
       return;
     }
 
-    return method.apply(null, methodArgs);
+    for (var _len = arguments.length, args = new Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
+      args[_key - 1] = arguments[_key];
+    }
+
+    return method.apply(null, args);
   };
 
   telemetry.set('loadedAt', 1 * new Date());
@@ -1843,7 +1841,9 @@ var statickit = (function () {
 
   ready(function () {
     window.sk = run;
-    queue.forEach(run);
+    queue.forEach(function (args) {
+      run.apply(null, args);
+    });
   });
   var index = window.sk;
 

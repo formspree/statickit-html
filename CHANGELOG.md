@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.0-beta.5
+
+- [Bug Fix] Initializing with the command queue was broken
+
 ## 1.0.0-beta.4
 
 - [Feature] Make it less dangerous to override lifecycle callbacks by re-arranging how default behaviors are run.
