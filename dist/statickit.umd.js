@@ -4,36 +4,6 @@
   (global = global || self, global.statickit = factory());
 }(this, function () { 'use strict';
 
-  function _typeof(obj) {
-    if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") {
-      _typeof = function (obj) {
-        return typeof obj;
-      };
-    } else {
-      _typeof = function (obj) {
-        return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj;
-      };
-    }
-
-    return _typeof(obj);
-  }
-
-  function _toArray(arr) {
-    return _arrayWithHoles(arr) || _iterableToArray(arr) || _nonIterableRest();
-  }
-
-  function _arrayWithHoles(arr) {
-    if (Array.isArray(arr)) return arr;
-  }
-
-  function _iterableToArray(iter) {
-    if (Symbol.iterator in Object(iter) || Object.prototype.toString.call(iter) === "[object Arguments]") return Array.from(iter);
-  }
-
-  function _nonIterableRest() {
-    throw new TypeError("Invalid attempt to destructure non-iterable instance");
-  }
-
   var ready = (function (fn) {
     if (document.readyState != 'loading') {
       fn();
@@ -62,6 +32,20 @@
       }
     };
   });
+
+  function _typeof(obj) {
+    if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") {
+      _typeof = function (obj) {
+        return typeof obj;
+      };
+    } else {
+      _typeof = function (obj) {
+        return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj;
+      };
+    }
+
+    return _typeof(obj);
+  }
 
   function createCommonjsModule(fn, module) {
   	return module = { exports: {} }, fn(module, module.exports), module.exports;
@@ -1820,19 +1804,21 @@
     }
   };
 
-  var run = function run(_ref) {
-    var _ref2 = _toArray(_ref),
-        scope = _ref2[0],
-        args = _ref2.slice(1);
+  var run = function run() {
+    for (var _len = arguments.length, args = new Array(_len), _key = 0; _key < _len; _key++) {
+      args[_key] = arguments[_key];
+    }
 
+    var scope = args[0];
+    var methodArgs = args.slice(1);
     var method = api[scope];
 
     if (!method) {
-      logger().log('Method `' + handler + '` does not exist');
+      logger().log('Method `' + scope + '` does not exist');
       return;
     }
 
-    return method.apply(null, args);
+    return method.apply(null, methodArgs);
   };
 
   telemetry.set('loadedAt', 1 * new Date());

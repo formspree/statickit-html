@@ -12,15 +12,17 @@ const api = {
   }
 };
 
-const run = ([scope, ...args]) => {
+const run = (...args) => {
+  const scope = args[0];
+  const methodArgs = args.slice(1);
   const method = api[scope];
 
   if (!method) {
-    logger('main').log('Method `' + handler + '` does not exist');
+    logger('main').log('Method `' + scope + '` does not exist');
     return;
   }
 
-  return method.apply(null, args);
+  return method.apply(null, methodArgs);
 };
 
 telemetry.set('loadedAt', 1 * new Date());
