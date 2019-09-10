@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.0-beta.3
+
+- [Bug Fix] Fix argument destructuring that broke after Babel transpiling
+
 ## 1.0.0-beta.2
 
 - [Feature] Accept a `fields` object in form config for customizing field pretty names and overriding default error messages.
