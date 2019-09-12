@@ -1628,7 +1628,7 @@ var statickit = (function () {
         switch (response.status) {
           case 200:
             logger().log(id, 'Submitted', data);
-            onSuccess(config);
+            onSuccess(config, data);
             break;
 
           case 422:
