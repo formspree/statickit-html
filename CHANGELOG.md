@@ -1,8 +1,12 @@
 # Changelog
 
+## 1.0.0-beta.6
+
+- [Feature] Pass response `data` as the second argument to the `onSuccess` handler.
+
 ## 1.0.0-beta.5
 
-- [Bug Fix] Initializing with the command queue was broken
+- [Bug Fix] Initializing with the command queue was broken.
 
 ## 1.0.0-beta.4
 
