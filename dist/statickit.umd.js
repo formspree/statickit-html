@@ -1719,16 +1719,16 @@
       return;
     }
 
-    var form = getFormElement(config.element);
-    var config = Object.assign(defaults, props, {
-      form: form
-    });
+    var form = getFormElement(props.element);
 
     if (!form) {
-      logger().log("Element `".concat(config.element, "` not found"));
+      logger().log("Element `".concat(props.element, "` not found"));
       return;
     }
 
+    var config = Object.assign(defaults, props, {
+      form: form
+    });
     return setup(config);
   };
 

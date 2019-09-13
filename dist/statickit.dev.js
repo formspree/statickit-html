@@ -1726,16 +1726,16 @@ var statickit = (function () {
       return;
     }
 
-    var form = getFormElement(config.element);
-    var config = Object.assign(defaults, props, {
-      form: form
-    });
+    var form = getFormElement(props.element);
 
     if (!form) {
-      logger('forms').log("Element `".concat(config.element, "` not found"));
+      logger('forms').log("Element `".concat(props.element, "` not found"));
       return;
     }
 
+    var config = Object.assign(defaults, props, {
+      form: form
+    });
     return setup(config);
   };
 

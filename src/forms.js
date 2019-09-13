@@ -228,14 +228,14 @@ const init = props => {
     return;
   }
 
-  const form = getFormElement(config.element);
-  const config = Object.assign(defaults, props, { form });
+  const form = getFormElement(props.element);
 
   if (!form) {
-    logger('forms').log(`Element \`${config.element}\` not found`);
+    logger('forms').log(`Element \`${props.element}\` not found`);
     return;
   }
 
+  const config = Object.assign(defaults, props, { form });
   return setup(config);
 };
 
