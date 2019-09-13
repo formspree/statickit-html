@@ -204,20 +204,38 @@ const setup = config => {
   return true;
 };
 
-const init = (selector, props) => {
-  const form = document.querySelector(selector);
-  const config = Object.assign(defaults, props, { form });
-
-  if (!form) {
-    logger('forms').log('Element `' + selector + '` not found');
-    return;
+/**
+ * Look up the form element by selector or accept the given element.
+ *
+ * @param {Element|String} nodeOrSelector
+ */
+const getFormElement = nodeOrSelector => {
+  if (nodeOrSelector.tagName == 'FORM') {
+    return nodeOrSelector;
+  } else {
+    return document.querySelector(nodeOrSelector);
   }
+};
 
-  if (!config.id) {
+const init = props => {
+  if (!props.id) {
     logger('forms').log('You must define an `id` property');
     return;
   }
 
+  if (!props.element) {
+    logger('forms').log('You must define an `element` property');
+    return;
+  }
+
+  const form = getFormElement(props.element);
+
+  if (!form) {
+    logger('forms').log(`Element \`${props.element}\` not found`);
+    return;
+  }
+
+  const config = Object.assign(defaults, props, { form });
   return setup(config);
 };
 

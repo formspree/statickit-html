@@ -1690,23 +1690,42 @@ var statickit = (function () {
     onInit(config);
     return true;
   };
+  /**
+   * Look up the form element by selector or accept the given element.
+   *
+   * @param {Element|String} nodeOrSelector
+   */
 
-  var init = function init(selector, props) {
-    var form = document.querySelector(selector);
-    var config = Object.assign(defaults, props, {
-      form: form
-    });
 
-    if (!form) {
-      logger().log('Element `' + selector + '` not found');
-      return;
+  var getFormElement = function getFormElement(nodeOrSelector) {
+    if (nodeOrSelector.tagName == 'FORM') {
+      return nodeOrSelector;
+    } else {
+      return document.querySelector(nodeOrSelector);
     }
+  };
 
-    if (!config.id) {
+  var init = function init(props) {
+    if (!props.id) {
       logger().log('You must define an `id` property');
       return;
     }
 
+    if (!props.element) {
+      logger().log('You must define an `element` property');
+      return;
+    }
+
+    var form = getFormElement(props.element);
+
+    if (!form) {
+      logger().log("Element `".concat(props.element, "` not found"));
+      return;
+    }
+
+    var config = Object.assign(defaults, props, {
+      form: form
+    });
     return setup(config);
   };
 
@@ -1796,8 +1815,23 @@ var statickit = (function () {
 
   var queue = window.sk ? window.sk.q : [];
   var api = {
-    form: function form() {
-      return forms.init.apply(forms, arguments);
+    form: function form(method) {
+      for (var _len = arguments.length, args = new Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
+        args[_key - 1] = arguments[_key];
+      }
+
+      switch (method) {
+        case 'init':
+          return forms.init.apply(forms, args);
+
+        default:
+          // To retain backwards compatiblilty with
+          // setting `element` selector as the second
+          // argument: sk('form', '#myform', { ... })
+          var config = args[0];
+          config.element = method;
+          return forms.init(config);
+      }
     }
   };
 
@@ -1805,12 +1839,12 @@ var statickit = (function () {
     var method = api[scope];
 
     if (!method) {
-      logger().log('Method `' + scope + '` does not exist');
+      logger().log("Method `".concat(scope, "` does not exist"));
       return;
     }
 
-    for (var _len = arguments.length, args = new Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
-      args[_key - 1] = arguments[_key];
+    for (var _len2 = arguments.length, args = new Array(_len2 > 1 ? _len2 - 1 : 0), _key2 = 1; _key2 < _len2; _key2++) {
+      args[_key2 - 1] = arguments[_key2];
     }
 
     return method.apply(null, args);

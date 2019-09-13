@@ -1,5 +1,35 @@
 # Changelog
 
+## 1.0.0-beta.7
+
+- [Feature] New argument structure (backwards compatibility retained)
+
+Previously, the form component was initialized as follows:
+
+```
+sk('form', '#my-form', { ... })
+```
+
+where `#my-form` is the selector targeting the form node.
+
+There are a few problems with this:
+
+- The positional argument is not self-documenting
+- `id` is also a required prop, but it lives in the third object (this is inconsistent)
+- It's inherently inflexible; what if we want to offer a teardown call, for example?
+
+Now, calls will take the form:
+
+```
+sk(scope, method, config)
+```
+
+So, initializing a form will look like this:
+
+```
+sk('form', 'init', { id: '...', element: '...' })
+```
+
 ## 1.0.0-beta.6
 
 - [Feature] Pass response `data` as the second argument to the `onSuccess` handler.
