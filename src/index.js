@@ -7,8 +7,19 @@ import './polyfills';
 const queue = window.sk ? window.sk.q : [];
 
 const api = {
-  form: (...args) => {
-    return forms.init(...args);
+  form: (method, ...args) => {
+    switch (method) {
+      case 'init':
+        return forms.init(...args);
+
+      default:
+        // To retain backwards compatiblilty with
+        // setting `element` selector as the second
+        // argument: sk('form', '#myform', { ... })
+        const [config] = args;
+        config.element = method;
+        return forms.init(config);
+    }
   }
 };
 
@@ -16,7 +27,7 @@ const run = (scope, ...args) => {
   const method = api[scope];
 
   if (!method) {
-    logger('main').log('Method `' + scope + '` does not exist');
+    logger('main').log(`Method \`${scope}\` does not exist`);
     return;
   }
 

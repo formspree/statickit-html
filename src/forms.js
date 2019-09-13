@@ -204,17 +204,23 @@ const setup = config => {
   return true;
 };
 
-const init = (selector, props) => {
-  const form = document.querySelector(selector);
+const init = props => {
   const config = Object.assign(defaults, props, { form });
-
-  if (!form) {
-    logger('forms').log('Element `' + selector + '` not found');
-    return;
-  }
 
   if (!config.id) {
     logger('forms').log('You must define an `id` property');
+    return;
+  }
+
+  if (!config.element) {
+    logger('forms').log('You must define an `element` property');
+    return;
+  }
+
+  const form = document.querySelector(config.element);
+
+  if (!form) {
+    logger('forms').log(`Element \`${config.element}\` not found`);
     return;
   }
 
