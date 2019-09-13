@@ -1690,23 +1690,36 @@ var statickit = (function () {
     onInit(config);
     return true;
   };
+  /**
+   * Look up the form element by selector or accept the given element.
+   *
+   * @param {Element|String} nodeOrSelector
+   */
+
+
+  var getFormElement = function getFormElement(nodeOrSelector) {
+    if (nodeOrSelector.tagName == 'FORM') {
+      return nodeOrSelector;
+    } else {
+      return document.querySelector(nodeOrSelector);
+    }
+  };
 
   var init = function init(props) {
-    var config = Object.assign(defaults, props, {
-      form: form
-    });
-
-    if (!config.id) {
+    if (!props.id) {
       logger().log('You must define an `id` property');
       return;
     }
 
-    if (!config.element) {
+    if (!props.element) {
       logger().log('You must define an `element` property');
       return;
     }
 
-    var form = document.querySelector(config.element);
+    var form = getFormElement(config.element);
+    var config = Object.assign(defaults, props, {
+      form: form
+    });
 
     if (!form) {
       logger().log("Element `".concat(config.element, "` not found"));
