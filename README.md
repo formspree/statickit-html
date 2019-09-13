@@ -1,6 +1,6 @@
-# StaticKit Standalone
+# StaticKit HTML
 
-The standalone JavaScript library for [StaticKit](https://statickit.com).
+The HTML library for [StaticKit](https://statickit.com).
 
 ## Getting Started
 
@@ -36,8 +36,9 @@ If you are using the npm package:
 ```js
 import sk from '@statickit/standalone';
 
-sk('form', '#my-form', {
-  id: '[your form id]'
+sk('form', 'init', {
+  id: '[...]',
+  element: '#my-form'
 });
 ```
 
@@ -45,14 +46,11 @@ If you are using the CDN:
 
 ```html
 <script>
-  window.sk =
-    window.sk ||
-    function() {
-      (sk.q = sk.q || []).push(arguments);
-    };
+  window.sk=window.sk||function(){(sk.q=sk.q||[]).push(arguments)};
 
-  sk('form', '#my-form', {
-    id: '[your form id]'
+  sk('form', 'init', {
+    id: '[...]',
+    element: '#my-form'
   });
 </script>
 ```
@@ -66,8 +64,9 @@ The most common thing you’ll want to customize is the behavior after the form 
 Here's an example config that replaces the form with a custom message:
 
 ```js
-sk('form', '#my-form', {
+sk('form', 'init', {
   id: '[...]',
+  element: '#my-form',
   onSuccess: function(config) {
     var h = config.h;
     var form = config.form;
@@ -87,8 +86,9 @@ Let's step through what's happening here:
 If you want to redirect to a different page, you can do that too:
 
 ```js
-sk('form', '#my-form', {
+sk('form', 'init', {
   id: '[...]',
+  element: '#my-form',
   onSuccess: function(config) {
     window.location.href = '/thank-you';
   }
@@ -116,8 +116,9 @@ If you need to include some additional fields programmatically, you can define t
 
 ```js
 // This will append a `userAgent` field to the form data
-sk('form', '#my-form', {
+sk('form', 'init', {
   id: '[...]',
+  element: '#my-form',
   data: {
     userAgent: navigator.userAgent
   }
@@ -127,8 +128,9 @@ sk('form', '#my-form', {
 Your `data` object values can either be static or functions (that will be called at submission time):
 
 ```js
-sk('form', '#my-form', {
+sk('form', 'init', {
   id: '[...]',
+  element: '#my-form',
   data: {
     pageTitle: function() {
       return document.title;
@@ -147,8 +149,9 @@ If you have an email notification action configured for your form, you can custo
 You may add `<input>` fields to your form to make these settable by the user, or set them programmatically:
 
 ```js
-sk('form', '#my-form', {
+sk('form', 'init', {
   id: '[...]',
+  element: '#my-form',
   data: {
     _subject: 'New contact submission'
   }
