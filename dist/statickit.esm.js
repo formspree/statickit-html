@@ -1608,7 +1608,7 @@ var submit = function submit(config) {
     }
   }
 
-  var telemetryData = Object.assign(telemetry.data(), {
+  var telemetryData = Object.assign({}, telemetry.data(), {
     submittedAt: 1 * new Date()
   });
   formData.append('_t', window.btoa(JSON.stringify(telemetryData)));
@@ -1720,7 +1720,7 @@ var init = function init(props) {
     return;
   }
 
-  var config = Object.assign(defaults, props, {
+  var config = Object.assign({}, defaults, props, {
     form: form
   });
   return setup(config);

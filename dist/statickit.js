@@ -1611,7 +1611,7 @@ var statickit = (function () {
       }
     }
 
-    var telemetryData = Object.assign(telemetry.data(), {
+    var telemetryData = Object.assign({}, telemetry.data(), {
       submittedAt: 1 * new Date()
     });
     formData.append('_t', window.btoa(JSON.stringify(telemetryData)));
@@ -1723,7 +1723,7 @@ var statickit = (function () {
       return;
     }
 
-    var config = Object.assign(defaults, props, {
+    var config = Object.assign({}, defaults, props, {
       form: form
     });
     return setup(config);

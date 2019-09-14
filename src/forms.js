@@ -115,7 +115,7 @@ const submit = config => {
     }
   }
 
-  const telemetryData = Object.assign(telemetry.data(), {
+  const telemetryData = Object.assign({}, telemetry.data(), {
     submittedAt: 1 * new Date()
   });
 
@@ -235,7 +235,7 @@ const init = props => {
     return;
   }
 
-  const config = Object.assign(defaults, props, { form });
+  const config = Object.assign({}, defaults, props, { form });
   return setup(config);
 };
 
