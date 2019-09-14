@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.0.0-beta.8
+
+- [Bug Fix] Multiple forms on a page were not submitting properly.
+
+Since we were not deeply-copying default config attributes, values were colliding during initialization.
+
 ## 1.0.0-beta.7
 
 - [Feature] New argument structure (backwards compatibility retained)
