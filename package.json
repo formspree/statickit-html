@@ -7,7 +7,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/levelhq/statickit-standalone.git"
+    "url": "https://github.com/unstacked/statickit-standalone.git"
   },
   "main": "dist/statickit.umd.js",
   "module": "dist/statickit.esm.js",
