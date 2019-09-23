@@ -1501,23 +1501,6 @@ function _asyncToGenerator$1(fn) {
   };
 }
 
-var logger = (function (tag) {
-  return {
-    log: function log() {
-
-      for (var _len = arguments.length, args = new Array(_len), _key = 0; _key < _len; _key++) {
-        args[_key] = arguments[_key];
-      }
-    },
-    error: function error() {
-
-      for (var _len2 = arguments.length, args = new Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
-        args[_key2] = arguments[_key2];
-      }
-    }
-  };
-});
-
 function createCommonjsModule$1(fn, module) {
 	return module = { exports: {} }, fn(module, module.exports), module.exports;
 }
@@ -3070,7 +3053,7 @@ function () {
             renderErrors(config, []);
             disable(config);
             onSubmit(config);
-            logger().log(id, 'Submitting');
+            if (config.debug) console.log(id, 'Submitting');
             _context.prev = 7;
             _context.next = 10;
             return client.submitForm({
@@ -3083,11 +3066,11 @@ function () {
             result = _context.sent;
 
             if (result.response.status == 200) {
-              logger().log(id, 'Submitted', result);
+              if (config.debug) console.log(id, 'Submitted', result);
               onSuccess(config, result.body);
             } else {
               errors = result.body.errors;
-              logger().log(id, 'Validation error', result);
+              if (config.debug) console.log(id, 'Validation error', result);
               renderErrors(config, errors);
               onError(config, errors);
             }
@@ -3098,7 +3081,7 @@ function () {
           case 14:
             _context.prev = 14;
             _context.t0 = _context["catch"](7);
-            logger().log(id, 'Unexpected error', _context.t0);
+            if (config.debug) console.log(id, 'Unexpected error', _context.t0);
             onFailure(config, _context.t0);
 
           case 18:
@@ -3135,7 +3118,8 @@ var defaults = {
   renderErrors: renderErrors,
   endpoint: 'https://api.statickit.com',
   data: {},
-  fields: {}
+  fields: {},
+  debug: false
 };
 /**
  * Setup the form.
@@ -3146,7 +3130,7 @@ var setup = function setup(client, config) {
       form = config.form,
       onInit = config.onInit,
       enable = config.enable;
-  logger().log(id, 'Initializing');
+  if (config.debug) console.log(id, 'Initializing');
   form.addEventListener('submit',
   /*#__PURE__*/
   function () {

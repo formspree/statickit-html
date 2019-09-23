@@ -1,4 +1,3 @@
-import logger from './logger';
 import h from 'hyperscript';
 import { toCamel } from './utils';
 
@@ -118,7 +117,7 @@ const submit = async (client, config) => {
   disable(config);
   onSubmit(config);
 
-  logger('forms').log(id, 'Submitting');
+  if (config.debug) console.log(id, 'Submitting');
 
   try {
     const result = await client.submitForm({
@@ -128,16 +127,16 @@ const submit = async (client, config) => {
     });
 
     if (result.response.status == 200) {
-      logger('forms').log(id, 'Submitted', result);
+      if (config.debug) console.log(id, 'Submitted', result);
       onSuccess(config, result.body);
     } else {
       const errors = result.body.errors;
-      logger('forms').log(id, 'Validation error', result);
+      if (config.debug) console.log(id, 'Validation error', result);
       renderErrors(config, errors);
       onError(config, errors);
     }
   } catch (e) {
-    logger('forms').log(id, 'Unexpected error', e);
+    if (config.debug) console.log(id, 'Unexpected error', e);
     onFailure(config, e);
   } finally {
     enable(config);
@@ -159,7 +158,8 @@ const defaults = {
   renderErrors: renderErrors,
   endpoint: 'https://api.statickit.com',
   data: {},
-  fields: {}
+  fields: {},
+  debug: false
 };
 
 /**
@@ -168,7 +168,7 @@ const defaults = {
 const setup = (client, config) => {
   const { id, form, onInit, enable } = config;
 
-  logger('forms').log(id, 'Initializing');
+  if (config.debug) console.log(id, 'Initializing');
 
   form.addEventListener('submit', async ev => {
     ev.preventDefault();

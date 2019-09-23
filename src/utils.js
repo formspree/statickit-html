@@ -1,4 +1,4 @@
-const toCamel = s => {
+export const toCamel = s => {
   return s.replace(/([-_][a-z])/gi, $1 => {
     return $1
       .toUpperCase()
@@ -6,5 +6,3 @@ const toCamel = s => {
       .replace('_', '');
   });
 };
-
-export { toCamel };

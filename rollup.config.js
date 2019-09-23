@@ -1,12 +1,10 @@
 import babel from 'rollup-plugin-babel';
 import commonjs from 'rollup-plugin-commonjs';
 import nodeResolve from 'rollup-plugin-node-resolve';
-import replace from 'rollup-plugin-replace';
 import { terser } from 'rollup-plugin-terser';
 
-const plugins = (env = {}) => [
+const plugins = [
   nodeResolve(),
-  replace(env),
   commonjs({
     include: 'node_modules/**'
   }),
@@ -18,9 +16,7 @@ const plugins = (env = {}) => [
 export default [
   {
     input: 'src/index.js',
-    plugins: plugins({
-      PRODUCTION: true
-    }),
+    plugins: plugins,
     output: {
       format: 'iife',
       name: 'statickit',
@@ -29,20 +25,7 @@ export default [
   },
   {
     input: 'src/index.js',
-    plugins: plugins({
-      PRODUCTION: false
-    }),
-    output: {
-      format: 'iife',
-      name: 'statickit',
-      file: __dirname + '/dist/statickit.dev.js'
-    }
-  },
-  {
-    input: 'src/index.js',
-    plugins: plugins({
-      PRODUCTION: true
-    }).concat(terser()),
+    plugins: plugins.concat(terser()),
     output: {
       format: 'iife',
       name: 'statickit',
@@ -51,9 +34,7 @@ export default [
   },
   {
     input: 'src/index.js',
-    plugins: plugins({
-      PRODUCTION: true
-    }),
+    plugins: plugins,
     output: {
       format: 'umd',
       name: 'statickit',
@@ -62,9 +43,7 @@ export default [
   },
   {
     input: 'src/index.js',
-    plugins: plugins({
-      PRODUCTION: true
-    }),
+    plugins: plugins,
     output: {
       format: 'esm',
       name: 'statickit',
