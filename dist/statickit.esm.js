@@ -3098,7 +3098,7 @@ function () {
 
           case 18:
             _context.prev = 18;
-            enable();
+            enable(config);
             return _context.finish(18);
 
           case 21:

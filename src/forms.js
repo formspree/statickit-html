@@ -140,7 +140,7 @@ const submit = async (client, config) => {
     logger('forms').log(id, 'Unexpected error', result);
     onFailure(config, e);
   } finally {
-    enable();
+    enable(config);
   }
 };
 
