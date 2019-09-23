@@ -1,10 +1,19 @@
 import StaticKit from '@statickit/core';
-import ready from './ready';
 import forms from './forms';
-import './polyfills';
 
 const client = StaticKit();
-const queue = window.sk ? window.sk.q : [];
+
+const ready = fn => {
+  if (document.readyState != 'loading') {
+    fn();
+  } else if (document.addEventListener) {
+    document.addEventListener('DOMContentLoaded', fn);
+  } else {
+    document.attachEvent('onreadystatechange', function() {
+      if (document.readyState != 'loading') fn();
+    });
+  }
+};
 
 const api = {
   form: (method, ...args) => {
@@ -37,7 +46,9 @@ window.sk =
   };
 
 ready(() => {
+  const queue = window.sk ? sk.q || [] : [];
   window.sk = run;
+
   queue.forEach(args => {
     run.apply(null, args);
   });

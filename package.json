@@ -30,6 +30,7 @@
   },
   "dependencies": {
     "@statickit/core": "github:unstacked/statickit-core",
+    "core-js-pure": "3.2.1",
     "hyperscript": "2.0.2"
   },
   "husky": {

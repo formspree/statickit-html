@@ -1,4 +1,5 @@
 import h from 'hyperscript';
+import assign from 'core-js-pure/features/object/assign';
 import { toCamel } from './utils';
 
 /**
@@ -184,7 +185,7 @@ const setup = (client, config) => {
 /**
  * Look up the form element by selector or accept the given element.
  *
- * @param {Element|String} nodeOrSelector
+ * @param {Element|string} nodeOrSelector
  */
 const getFormElement = nodeOrSelector => {
   if (nodeOrSelector.tagName == 'FORM') {
@@ -201,7 +202,7 @@ const init = (client, props) => {
   const form = getFormElement(props.element);
   if (!form) throw new Error(`Element \`${props.element}\` not found`);
 
-  const config = Object.assign({}, defaults, props, { form });
+  const config = assign({}, defaults, props, { form });
   return setup(client, config);
 };
 
