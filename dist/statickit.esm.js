@@ -3389,44 +3389,12 @@ var toCamel = function toCamel(s) {
   });
 };
 
-/**
- * The default init callback.
- */
-
-var onInit = function onInit(_config) {};
-/**
- * The default submit callback.
- */
-
-
-var onSubmit = function onSubmit(_config) {};
-/**
- * The default success callback.
- */
-
-
 var onSuccess = function onSuccess(config, _resp) {
   var h = config.h,
       form = config.form;
   var replacement = h('div', {}, 'Thank you!');
   form.parentNode.replaceChild(replacement, form);
 };
-/**
- * The default error callback.
- */
-
-
-var onError = function onError(_config, _errors) {};
-/**
- * The default failure callback.
- */
-
-
-var onFailure = function onFailure(_config) {};
-/**
- * The default enable hook.
- */
-
 
 var enable = function enable(config) {
   var buttons = config.form.querySelectorAll("[type='submit']:disabled");
@@ -3434,10 +3402,6 @@ var enable = function enable(config) {
     button.disabled = false;
   });
 };
-/**
- * The default disable hook.
- */
-
 
 var disable = function disable(config) {
   var buttons = config.form.querySelectorAll("[type='submit']:enabled");
@@ -3445,10 +3409,6 @@ var disable = function disable(config) {
     button.disabled = true;
   });
 };
-/**
- * The default error rendering hook.
- */
-
 
 var renderErrors = function renderErrors(config, errors) {
   var elements = config.form.querySelectorAll('[data-sk-error]');
@@ -3475,10 +3435,6 @@ var renderErrors = function renderErrors(config, errors) {
     element.innerHTML = fullMessage;
   });
 };
-/**
- * Submits the form.
- */
-
 
 var submit =
 /*#__PURE__*/
@@ -3563,11 +3519,11 @@ function () {
 
 var defaults = {
   h: hyperscript,
-  onInit: onInit,
-  onSubmit: onSubmit,
+  onInit: function onInit() {},
+  onSubmit: function onSubmit() {},
+  onError: function onError() {},
+  onFailure: function onFailure() {},
   onSuccess: onSuccess,
-  onError: onError,
-  onFailure: onFailure,
   enable: enable,
   disable: disable,
   renderErrors: renderErrors,
@@ -3576,9 +3532,6 @@ var defaults = {
   fields: {},
   debug: false
 };
-/**
- * Setup the form.
- */
 
 var setup = function setup(client, config) {
   var id = config.id,
@@ -3619,12 +3572,6 @@ var setup = function setup(client, config) {
   onInit(config);
   return true;
 };
-/**
- * Look up the form element by selector or accept the given element.
- *
- * @param {Element|string} nodeOrSelector
- */
-
 
 var getFormElement = function getFormElement(nodeOrSelector) {
   if (nodeOrSelector.tagName == 'FORM') {

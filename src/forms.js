@@ -2,38 +2,12 @@ import h from 'hyperscript';
 import assign from 'core-js-pure/features/object/assign';
 import { toCamel } from './utils';
 
-/**
- * The default init callback.
- */
-const onInit = _config => {};
-
-/**
- * The default submit callback.
- */
-const onSubmit = _config => {};
-
-/**
- * The default success callback.
- */
 const onSuccess = (config, _resp) => {
   const { h, form } = config;
   const replacement = h('div', {}, 'Thank you!');
   form.parentNode.replaceChild(replacement, form);
 };
 
-/**
- * The default error callback.
- */
-const onError = (_config, _errors) => {};
-
-/**
- * The default failure callback.
- */
-const onFailure = _config => {};
-
-/**
- * The default enable hook.
- */
 const enable = config => {
   const buttons = config.form.querySelectorAll("[type='submit']:disabled");
 
@@ -42,9 +16,6 @@ const enable = config => {
   });
 };
 
-/**
- * The default disable hook.
- */
 const disable = config => {
   const buttons = config.form.querySelectorAll("[type='submit']:enabled");
 
@@ -53,9 +24,6 @@ const disable = config => {
   });
 };
 
-/**
- * The default error rendering hook.
- */
 const renderErrors = (config, errors) => {
   const elements = config.form.querySelectorAll('[data-sk-error]');
 
@@ -83,9 +51,6 @@ const renderErrors = (config, errors) => {
   });
 };
 
-/**
- * Submits the form.
- */
 const submit = async (client, config) => {
   const {
     id,
@@ -149,11 +114,11 @@ const submit = async (client, config) => {
  */
 const defaults = {
   h: h,
-  onInit: onInit,
-  onSubmit: onSubmit,
+  onInit: () => {},
+  onSubmit: () => {},
+  onError: () => {},
+  onFailure: () => {},
   onSuccess: onSuccess,
-  onError: onError,
-  onFailure: onFailure,
   enable: enable,
   disable: disable,
   renderErrors: renderErrors,
@@ -163,9 +128,6 @@ const defaults = {
   debug: false
 };
 
-/**
- * Setup the form.
- */
 const setup = (client, config) => {
   const { id, form, onInit, enable } = config;
 
@@ -182,11 +144,6 @@ const setup = (client, config) => {
   return true;
 };
 
-/**
- * Look up the form element by selector or accept the given element.
- *
- * @param {Element|string} nodeOrSelector
- */
 const getFormElement = nodeOrSelector => {
   if (nodeOrSelector.tagName == 'FORM') {
     return nodeOrSelector;
