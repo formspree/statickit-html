@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.0-beta.9
+
+- [Refactoring] Use the `@statickit/core` library.
+
 ## 1.0.0-beta.8
 
 - [Bug Fix] Multiple forms on a page were not submitting properly.
