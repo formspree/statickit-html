@@ -137,7 +137,7 @@ const submit = async (client, config) => {
       onError(config, errors);
     }
   } catch (e) {
-    logger('forms').log(id, 'Unexpected error', result);
+    logger('forms').log(id, 'Unexpected error', e);
     onFailure(config, e);
   } finally {
     enable(config);

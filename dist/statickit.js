@@ -3045,8 +3045,7 @@ var statickit = (function () {
     var _ref = _asyncToGenerator$1(
     /*#__PURE__*/
     regeneratorRuntime.mark(function _callee(client, config) {
-      var id, form, enable, disable, renderErrors, onSubmit, onSuccess, onError, endpoint, data, formData, prop, _result, errors;
-
+      var id, form, enable, disable, renderErrors, onSubmit, onSuccess, onError, endpoint, data, formData, prop, result, errors;
       return regeneratorRuntime.wrap(function _callee$(_context) {
         while (1) {
           switch (_context.prev = _context.next) {
@@ -3078,14 +3077,14 @@ var statickit = (function () {
               });
 
             case 10:
-              _result = _context.sent;
+              result = _context.sent;
 
-              if (_result.response.status == 200) {
-                logger().log(id, 'Submitted', _result);
-                onSuccess(config, _result.body);
+              if (result.response.status == 200) {
+                logger().log(id, 'Submitted', result);
+                onSuccess(config, result.body);
               } else {
-                errors = _result.body.errors;
-                logger().log(id, 'Validation error', _result);
+                errors = result.body.errors;
+                logger().log(id, 'Validation error', result);
                 renderErrors(config, errors);
                 onError(config, errors);
               }
@@ -3096,7 +3095,7 @@ var statickit = (function () {
             case 14:
               _context.prev = 14;
               _context.t0 = _context["catch"](7);
-              logger().log(id, 'Unexpected error', result);
+              logger().log(id, 'Unexpected error', _context.t0);
               onFailure(config, _context.t0);
 
             case 18:
