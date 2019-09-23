@@ -1,6 +1,5 @@
 import logger from './logger';
 import h from 'hyperscript';
-import telemetry from './telemetry';
 import { toCamel } from './utils';
 
 /**
@@ -87,7 +86,7 @@ const renderErrors = (config, errors) => {
 /**
  * Submits the form.
  */
-const submit = config => {
+const submit = async (client, config) => {
   const {
     id,
     form,
@@ -101,7 +100,6 @@ const submit = config => {
     data
   } = config;
 
-  const url = endpoint + '/j/forms/' + id + '/submissions';
   const formData = new FormData(form);
 
   // Append data from config
@@ -115,57 +113,35 @@ const submit = config => {
     }
   }
 
-  const telemetryData = Object.assign({}, telemetry.data(), {
-    submittedAt: 1 * new Date()
-  });
-
-  formData.append('_t', window.btoa(JSON.stringify(telemetryData)));
-
+  // Clear visible errors before submitting
   renderErrors(config, []);
   disable(config);
   onSubmit(config);
 
   logger('forms').log(id, 'Submitting');
 
-  fetch(url, {
-    method: 'POST',
-    mode: 'cors',
-    body: formData
-  })
-    .then(response => {
-      response.json().then(data => {
-        switch (response.status) {
-          case 200:
-            logger('forms').log(id, 'Submitted', data);
-            onSuccess(config, data);
-            break;
-
-          case 422:
-            logger('forms').log(id, 'Validation error', data);
-            renderErrors(config, data.errors);
-            onError(config, data.errors);
-            break;
-
-          default:
-            logger('forms').log(id, 'Unexpected error', data);
-            onFailure(config);
-            break;
-        }
-
-        return true;
-      });
-    })
-    .catch(error => {
-      logger('forms').log(id, 'Unexpected error ', error);
-      onFailure(config);
-      return true;
-    })
-    .finally(() => {
-      enable(config);
-      return true;
+  try {
+    const result = await client.submitForm({
+      id: id,
+      endpoint: endpoint,
+      data: formData
     });
 
-  return true;
+    if (result.response.status == 200) {
+      logger('forms').log(id, 'Submitted', result);
+      onSuccess(config, result.body);
+    } else {
+      const errors = result.body.errors;
+      logger('forms').log(id, 'Validation error', result);
+      renderErrors(config, errors);
+      onError(config, errors);
+    }
+  } catch (e) {
+    logger('forms').log(id, 'Unexpected error', result);
+    onFailure(config, e);
+  } finally {
+    enable();
+  }
 };
 
 /**
@@ -189,14 +165,15 @@ const defaults = {
 /**
  * Setup the form.
  */
-const setup = config => {
+const setup = (client, config) => {
   const { id, form, onInit, enable } = config;
 
   logger('forms').log(id, 'Initializing');
 
-  form.addEventListener('submit', ev => {
+  form.addEventListener('submit', async ev => {
     ev.preventDefault();
-    submit(config);
+    await submit(client, config);
+    return true;
   });
 
   enable(config);
@@ -217,26 +194,15 @@ const getFormElement = nodeOrSelector => {
   }
 };
 
-const init = props => {
-  if (!props.id) {
-    logger('forms').log('You must define an `id` property');
-    return;
-  }
-
-  if (!props.element) {
-    logger('forms').log('You must define an `element` property');
-    return;
-  }
+const init = (client, props) => {
+  if (!props.id) throw new Error('You must define an `id` property');
+  if (!props.element) throw new Error('You must define an `element` property');
 
   const form = getFormElement(props.element);
-
-  if (!form) {
-    logger('forms').log(`Element \`${props.element}\` not found`);
-    return;
-  }
+  if (!form) throw new Error(`Element \`${props.element}\` not found`);
 
   const config = Object.assign({}, defaults, props, { form });
-  return setup(config);
+  return setup(client, config);
 };
 
 export default { init };

@@ -1,56 +1,34 @@
+import StaticKit from '@statickit/core';
 import ready from './ready';
-import logger from './logger';
 import forms from './forms';
-import telemetry from './telemetry';
 import './polyfills';
 
+const client = StaticKit();
 const queue = window.sk ? window.sk.q : [];
 
 const api = {
   form: (method, ...args) => {
+    const [props] = args;
+
     switch (method) {
       case 'init':
-        return forms.init(...args);
+        return forms.init(client, props);
 
       default:
         // To retain backwards compatiblilty with
         // setting `element` selector as the second
         // argument: sk('form', '#myform', { ... })
-        const [config] = args;
-        config.element = method;
-        return forms.init(config);
+        props.element = method;
+        return forms.init(client, props);
     }
   }
 };
 
 const run = (scope, ...args) => {
   const method = api[scope];
-
-  if (!method) {
-    logger('main').log(`Method \`${scope}\` does not exist`);
-    return;
-  }
-
+  if (!method) throw new Error(`Method \`${scope}\` does not exist`);
   return method.apply(null, args);
 };
-
-telemetry.set('loadedAt', 1 * new Date());
-
-window.addEventListener('mousemove', () => {
-  telemetry.inc('mousemove');
-});
-
-window.addEventListener('keydown', () => {
-  telemetry.inc('keydown');
-});
-
-telemetry.set(
-  'webdriver',
-  navigator.webdriver ||
-    document.documentElement.getAttribute('webdriver') ||
-    !!window.callPhantom ||
-    !!window._phantom
-);
 
 window.sk =
   window.sk ||
