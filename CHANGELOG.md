@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.0-beta.11
+
+- Update StaticKit Core (update base64 polyfill)
+
 ## 1.0.0-beta.10
 
 - Update StaticKit Core

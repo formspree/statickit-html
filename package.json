@@ -1,6 +1,6 @@
 {
   "name": "@statickit/standalone",
-  "version": "1.0.0-beta.10",
+  "version": "1.0.0-beta.11",
   "description": "The JavaScript client for StaticKit",
   "homepage": "https://statickit.com",
   "author": "Derrick Reimer",
@@ -29,8 +29,8 @@
     "rollup-plugin-terser": "5.1.1"
   },
   "dependencies": {
-    "@statickit/core": "1.1.0",
-    "hyperscript": "2.0.2"
+    "@statickit/core": "^1.2.0",
+    "hyperscript": "^2.0.2"
   },
   "husky": {
     "hooks": {
