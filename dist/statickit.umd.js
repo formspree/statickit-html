@@ -4,8 +4,6 @@
   (global = global || self, global.statickit = factory());
 }(this, function () { 'use strict';
 
-  var commonjsGlobal = typeof globalThis !== 'undefined' ? globalThis : typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : typeof self !== 'undefined' ? self : {};
-
   function createCommonjsModule(fn, module) {
   	return module = { exports: {} }, fn(module, module.exports), module.exports;
   }
@@ -879,470 +877,36 @@
     }
   };
 
-  var O = 'object';
-  var check = function (it) {
-    return it && it.Math == Math && it;
-  };
-
-  // https://github.com/zloirock/core-js/issues/86#issuecomment-115759028
-  var global_1 =
-    // eslint-disable-next-line no-undef
-    check(typeof globalThis == O && globalThis) ||
-    check(typeof window == O && window) ||
-    check(typeof self == O && self) ||
-    check(typeof commonjsGlobal == O && commonjsGlobal) ||
-    // eslint-disable-next-line no-new-func
-    Function('return this')();
-
-  var fails = function (exec) {
-    try {
-      return !!exec();
-    } catch (error) {
-      return true;
-    }
-  };
-
-  // Thank's IE8 for his funny defineProperty
-  var descriptors = !fails(function () {
-    return Object.defineProperty({}, 'a', { get: function () { return 7; } }).a != 7;
-  });
-
-  var nativePropertyIsEnumerable = {}.propertyIsEnumerable;
-  var getOwnPropertyDescriptor = Object.getOwnPropertyDescriptor;
-
-  // Nashorn ~ JDK8 bug
-  var NASHORN_BUG = getOwnPropertyDescriptor && !nativePropertyIsEnumerable.call({ 1: 2 }, 1);
-
-  // `Object.prototype.propertyIsEnumerable` method implementation
-  // https://tc39.github.io/ecma262/#sec-object.prototype.propertyisenumerable
-  var f = NASHORN_BUG ? function propertyIsEnumerable(V) {
-    var descriptor = getOwnPropertyDescriptor(this, V);
-    return !!descriptor && descriptor.enumerable;
-  } : nativePropertyIsEnumerable;
-
-  var objectPropertyIsEnumerable = {
-  	f: f
-  };
-
-  var createPropertyDescriptor = function (bitmap, value) {
-    return {
-      enumerable: !(bitmap & 1),
-      configurable: !(bitmap & 2),
-      writable: !(bitmap & 4),
-      value: value
-    };
-  };
-
-  var toString = {}.toString;
-
-  var classofRaw = function (it) {
-    return toString.call(it).slice(8, -1);
-  };
-
-  var split = ''.split;
-
-  // fallback for non-array-like ES3 and non-enumerable old V8 strings
-  var indexedObject = fails(function () {
-    // throws an error in rhino, see https://github.com/mozilla/rhino/issues/346
-    // eslint-disable-next-line no-prototype-builtins
-    return !Object('z').propertyIsEnumerable(0);
-  }) ? function (it) {
-    return classofRaw(it) == 'String' ? split.call(it, '') : Object(it);
-  } : Object;
-
-  // `RequireObjectCoercible` abstract operation
-  // https://tc39.github.io/ecma262/#sec-requireobjectcoercible
-  var requireObjectCoercible = function (it) {
-    if (it == undefined) throw TypeError("Can't call method on " + it);
-    return it;
-  };
-
-  // toObject with fallback for non-array-like ES3 strings
-
-
-
-  var toIndexedObject = function (it) {
-    return indexedObject(requireObjectCoercible(it));
-  };
-
-  var isObject = function (it) {
-    return typeof it === 'object' ? it !== null : typeof it === 'function';
-  };
-
-  // `ToPrimitive` abstract operation
-  // https://tc39.github.io/ecma262/#sec-toprimitive
-  // instead of the ES6 spec version, we didn't implement @@toPrimitive case
-  // and the second argument - flag - preferred type is a string
-  var toPrimitive = function (input, PREFERRED_STRING) {
-    if (!isObject(input)) return input;
-    var fn, val;
-    if (PREFERRED_STRING && typeof (fn = input.toString) == 'function' && !isObject(val = fn.call(input))) return val;
-    if (typeof (fn = input.valueOf) == 'function' && !isObject(val = fn.call(input))) return val;
-    if (!PREFERRED_STRING && typeof (fn = input.toString) == 'function' && !isObject(val = fn.call(input))) return val;
-    throw TypeError("Can't convert object to primitive value");
-  };
-
-  var hasOwnProperty = {}.hasOwnProperty;
-
-  var has = function (it, key) {
-    return hasOwnProperty.call(it, key);
-  };
-
-  var document$1 = global_1.document;
-  // typeof document.createElement is 'object' in old IE
-  var EXISTS = isObject(document$1) && isObject(document$1.createElement);
-
-  var documentCreateElement = function (it) {
-    return EXISTS ? document$1.createElement(it) : {};
-  };
-
-  // Thank's IE8 for his funny defineProperty
-  var ie8DomDefine = !descriptors && !fails(function () {
-    return Object.defineProperty(documentCreateElement('div'), 'a', {
-      get: function () { return 7; }
-    }).a != 7;
-  });
-
-  var nativeGetOwnPropertyDescriptor = Object.getOwnPropertyDescriptor;
-
-  // `Object.getOwnPropertyDescriptor` method
-  // https://tc39.github.io/ecma262/#sec-object.getownpropertydescriptor
-  var f$1 = descriptors ? nativeGetOwnPropertyDescriptor : function getOwnPropertyDescriptor(O, P) {
-    O = toIndexedObject(O);
-    P = toPrimitive(P, true);
-    if (ie8DomDefine) try {
-      return nativeGetOwnPropertyDescriptor(O, P);
-    } catch (error) { /* empty */ }
-    if (has(O, P)) return createPropertyDescriptor(!objectPropertyIsEnumerable.f.call(O, P), O[P]);
-  };
-
-  var objectGetOwnPropertyDescriptor = {
-  	f: f$1
-  };
-
-  var replacement = /#|\.prototype\./;
-
-  var isForced = function (feature, detection) {
-    var value = data$1[normalize(feature)];
-    return value == POLYFILL ? true
-      : value == NATIVE ? false
-      : typeof detection == 'function' ? fails(detection)
-      : !!detection;
-  };
-
-  var normalize = isForced.normalize = function (string) {
-    return String(string).replace(replacement, '.').toLowerCase();
-  };
-
-  var data$1 = isForced.data = {};
-  var NATIVE = isForced.NATIVE = 'N';
-  var POLYFILL = isForced.POLYFILL = 'P';
-
-  var isForced_1 = isForced;
-
-  var path = {};
-
-  var aFunction = function (it) {
-    if (typeof it != 'function') {
-      throw TypeError(String(it) + ' is not a function');
-    } return it;
-  };
-
-  // optional / simple context binding
-  var bindContext = function (fn, that, length) {
-    aFunction(fn);
-    if (that === undefined) return fn;
-    switch (length) {
-      case 0: return function () {
-        return fn.call(that);
-      };
-      case 1: return function (a) {
-        return fn.call(that, a);
-      };
-      case 2: return function (a, b) {
-        return fn.call(that, a, b);
-      };
-      case 3: return function (a, b, c) {
-        return fn.call(that, a, b, c);
-      };
-    }
-    return function (/* ...args */) {
-      return fn.apply(that, arguments);
-    };
-  };
-
-  var anObject = function (it) {
-    if (!isObject(it)) {
-      throw TypeError(String(it) + ' is not an object');
-    } return it;
-  };
-
-  var nativeDefineProperty = Object.defineProperty;
-
-  // `Object.defineProperty` method
-  // https://tc39.github.io/ecma262/#sec-object.defineproperty
-  var f$2 = descriptors ? nativeDefineProperty : function defineProperty(O, P, Attributes) {
-    anObject(O);
-    P = toPrimitive(P, true);
-    anObject(Attributes);
-    if (ie8DomDefine) try {
-      return nativeDefineProperty(O, P, Attributes);
-    } catch (error) { /* empty */ }
-    if ('get' in Attributes || 'set' in Attributes) throw TypeError('Accessors not supported');
-    if ('value' in Attributes) O[P] = Attributes.value;
-    return O;
-  };
-
-  var objectDefineProperty = {
-  	f: f$2
-  };
-
-  var hide = descriptors ? function (object, key, value) {
-    return objectDefineProperty.f(object, key, createPropertyDescriptor(1, value));
-  } : function (object, key, value) {
-    object[key] = value;
-    return object;
-  };
-
-  var getOwnPropertyDescriptor$1 = objectGetOwnPropertyDescriptor.f;
-
-
-
-
-
-
-  var wrapConstructor = function (NativeConstructor) {
-    var Wrapper = function (a, b, c) {
-      if (this instanceof NativeConstructor) {
-        switch (arguments.length) {
-          case 0: return new NativeConstructor();
-          case 1: return new NativeConstructor(a);
-          case 2: return new NativeConstructor(a, b);
-        } return new NativeConstructor(a, b, c);
-      } return NativeConstructor.apply(this, arguments);
-    };
-    Wrapper.prototype = NativeConstructor.prototype;
-    return Wrapper;
-  };
-
-  /*
-    options.target      - name of the target object
-    options.global      - target is the global object
-    options.stat        - export as static methods of target
-    options.proto       - export as prototype methods of target
-    options.real        - real prototype method for the `pure` version
-    options.forced      - export even if the native feature is available
-    options.bind        - bind methods to the target, required for the `pure` version
-    options.wrap        - wrap constructors to preventing global pollution, required for the `pure` version
-    options.unsafe      - use the simple assignment of property instead of delete + defineProperty
-    options.sham        - add a flag to not completely full polyfills
-    options.enumerable  - export as enumerable property
-    options.noTargetGet - prevent calling a getter on target
-  */
-  var _export = function (options, source) {
-    var TARGET = options.target;
-    var GLOBAL = options.global;
-    var STATIC = options.stat;
-    var PROTO = options.proto;
-
-    var nativeSource = GLOBAL ? global_1 : STATIC ? global_1[TARGET] : (global_1[TARGET] || {}).prototype;
-
-    var target = GLOBAL ? path : path[TARGET] || (path[TARGET] = {});
-    var targetPrototype = target.prototype;
-
-    var FORCED, USE_NATIVE, VIRTUAL_PROTOTYPE;
-    var key, sourceProperty, targetProperty, nativeProperty, resultProperty, descriptor;
-
-    for (key in source) {
-      FORCED = isForced_1(GLOBAL ? key : TARGET + (STATIC ? '.' : '#') + key, options.forced);
-      // contains in native
-      USE_NATIVE = !FORCED && nativeSource && has(nativeSource, key);
-
-      targetProperty = target[key];
-
-      if (USE_NATIVE) if (options.noTargetGet) {
-        descriptor = getOwnPropertyDescriptor$1(nativeSource, key);
-        nativeProperty = descriptor && descriptor.value;
-      } else nativeProperty = nativeSource[key];
-
-      // export native or implementation
-      sourceProperty = (USE_NATIVE && nativeProperty) ? nativeProperty : source[key];
-
-      if (USE_NATIVE && typeof targetProperty === typeof sourceProperty) continue;
-
-      // bind timers to global for call from export context
-      if (options.bind && USE_NATIVE) resultProperty = bindContext(sourceProperty, global_1);
-      // wrap global constructors for prevent changs in this version
-      else if (options.wrap && USE_NATIVE) resultProperty = wrapConstructor(sourceProperty);
-      // make static versions for prototype methods
-      else if (PROTO && typeof sourceProperty == 'function') resultProperty = bindContext(Function.call, sourceProperty);
-      // default case
-      else resultProperty = sourceProperty;
-
-      // add a flag to not completely full polyfills
-      if (options.sham || (sourceProperty && sourceProperty.sham) || (targetProperty && targetProperty.sham)) {
-        hide(resultProperty, 'sham', true);
-      }
-
-      target[key] = resultProperty;
-
-      if (PROTO) {
-        VIRTUAL_PROTOTYPE = TARGET + 'Prototype';
-        if (!has(path, VIRTUAL_PROTOTYPE)) hide(path, VIRTUAL_PROTOTYPE, {});
-        // export virtual prototype methods
-        path[VIRTUAL_PROTOTYPE][key] = sourceProperty;
-        // export real prototype methods
-        if (options.real && targetPrototype && !targetPrototype[key]) hide(targetPrototype, key, sourceProperty);
-      }
-    }
-  };
-
-  var ceil = Math.ceil;
-  var floor = Math.floor;
-
-  // `ToInteger` abstract operation
-  // https://tc39.github.io/ecma262/#sec-tointeger
-  var toInteger = function (argument) {
-    return isNaN(argument = +argument) ? 0 : (argument > 0 ? floor : ceil)(argument);
-  };
-
-  var min = Math.min;
-
-  // `ToLength` abstract operation
-  // https://tc39.github.io/ecma262/#sec-tolength
-  var toLength = function (argument) {
-    return argument > 0 ? min(toInteger(argument), 0x1FFFFFFFFFFFFF) : 0; // 2 ** 53 - 1 == 9007199254740991
-  };
-
-  var max = Math.max;
-  var min$1 = Math.min;
-
-  // Helper for a popular repeating case of the spec:
-  // Let integer be ? ToInteger(index).
-  // If integer < 0, let result be max((length + integer), 0); else let result be min(length, length).
-  var toAbsoluteIndex = function (index, length) {
-    var integer = toInteger(index);
-    return integer < 0 ? max(integer + length, 0) : min$1(integer, length);
-  };
-
-  // `Array.prototype.{ indexOf, includes }` methods implementation
-  var createMethod = function (IS_INCLUDES) {
-    return function ($this, el, fromIndex) {
-      var O = toIndexedObject($this);
-      var length = toLength(O.length);
-      var index = toAbsoluteIndex(fromIndex, length);
-      var value;
-      // Array#includes uses SameValueZero equality algorithm
-      // eslint-disable-next-line no-self-compare
-      if (IS_INCLUDES && el != el) while (length > index) {
-        value = O[index++];
-        // eslint-disable-next-line no-self-compare
-        if (value != value) return true;
-      // Array#indexOf ignores holes, Array#includes - not
-      } else for (;length > index; index++) {
-        if ((IS_INCLUDES || index in O) && O[index] === el) return IS_INCLUDES || index || 0;
-      } return !IS_INCLUDES && -1;
-    };
-  };
-
-  var arrayIncludes = {
-    // `Array.prototype.includes` method
-    // https://tc39.github.io/ecma262/#sec-array.prototype.includes
-    includes: createMethod(true),
-    // `Array.prototype.indexOf` method
-    // https://tc39.github.io/ecma262/#sec-array.prototype.indexof
-    indexOf: createMethod(false)
-  };
-
-  var hiddenKeys = {};
-
-  var indexOf = arrayIncludes.indexOf;
-
-
-  var objectKeysInternal = function (object, names) {
-    var O = toIndexedObject(object);
-    var i = 0;
-    var result = [];
-    var key;
-    for (key in O) !has(hiddenKeys, key) && has(O, key) && result.push(key);
-    // Don't enum bug & hidden keys
-    while (names.length > i) if (has(O, key = names[i++])) {
-      ~indexOf(result, key) || result.push(key);
-    }
-    return result;
-  };
-
-  // IE8- don't enum bug keys
-  var enumBugKeys = [
-    'constructor',
-    'hasOwnProperty',
-    'isPrototypeOf',
-    'propertyIsEnumerable',
-    'toLocaleString',
-    'toString',
-    'valueOf'
-  ];
-
-  // `Object.keys` method
-  // https://tc39.github.io/ecma262/#sec-object.keys
-  var objectKeys = Object.keys || function keys(O) {
-    return objectKeysInternal(O, enumBugKeys);
-  };
-
-  var f$3 = Object.getOwnPropertySymbols;
-
-  var objectGetOwnPropertySymbols = {
-  	f: f$3
-  };
-
-  // `ToObject` abstract operation
-  // https://tc39.github.io/ecma262/#sec-toobject
-  var toObject = function (argument) {
-    return Object(requireObjectCoercible(argument));
-  };
-
-  var nativeAssign = Object.assign;
-
-  // `Object.assign` method
-  // https://tc39.github.io/ecma262/#sec-object.assign
-  // should work with symbols and should have deterministic property order (V8 bug)
-  var objectAssign = !nativeAssign || fails(function () {
-    var A = {};
-    var B = {};
-    // eslint-disable-next-line no-undef
-    var symbol = Symbol();
-    var alphabet = 'abcdefghijklmnopqrst';
-    A[symbol] = 7;
-    alphabet.split('').forEach(function (chr) { B[chr] = chr; });
-    return nativeAssign({}, A)[symbol] != 7 || objectKeys(nativeAssign({}, B)).join('') != alphabet;
-  }) ? function assign(target, source) { // eslint-disable-line no-unused-vars
-    var T = toObject(target);
-    var argumentsLength = arguments.length;
-    var index = 1;
-    var getOwnPropertySymbols = objectGetOwnPropertySymbols.f;
-    var propertyIsEnumerable = objectPropertyIsEnumerable.f;
-    while (argumentsLength > index) {
-      var S = indexedObject(arguments[index++]);
-      var keys = getOwnPropertySymbols ? objectKeys(S).concat(getOwnPropertySymbols(S)) : objectKeys(S);
-      var length = keys.length;
-      var j = 0;
-      var key;
-      while (length > j) {
-        key = keys[j++];
-        if (!descriptors || propertyIsEnumerable.call(S, key)) T[key] = S[key];
-      }
-    } return T;
-  } : nativeAssign;
-
-  // `Object.assign` method
-  // https://tc39.github.io/ecma262/#sec-object.assign
-  _export({ target: 'Object', stat: true, forced: Object.assign !== objectAssign }, {
-    assign: objectAssign
-  });
-
-  var assign = path.Object.assign;
-
-  var assign$1 = assign;
+  if (typeof Object.assign !== 'function') {
+    // Must be writable: true, enumerable: false, configurable: true
+    Object.defineProperty(Object, 'assign', {
+      value: function assign(target, varArgs) {
+
+        if (target === null || target === undefined) {
+          throw new TypeError('Cannot convert undefined or null to object');
+        }
+
+        var to = Object(target);
+
+        for (var index = 1; index < arguments.length; index++) {
+          var nextSource = arguments[index];
+
+          if (nextSource !== null && nextSource !== undefined) {
+            for (var nextKey in nextSource) {
+              // Avoid bugs when hasOwnProperty is shadowed
+              if (Object.prototype.hasOwnProperty.call(nextSource, nextKey)) {
+                to[nextKey] = nextSource[nextKey];
+              }
+            }
+          }
+        }
+
+        return to;
+      },
+      writable: true,
+      configurable: true
+    });
+  }
 
   var StaticKit =
   /*#__PURE__*/
@@ -1358,22 +922,37 @@
         keydown: 0,
         webdriver: navigator.webdriver || document.documentElement.getAttribute('webdriver') || !!window.callPhantom || !!window._phantom
       };
-      window.addEventListener('mousemove', function () {
+
+      this._onMouseMove = function () {
         _this.session.mousemove += 1;
-      });
-      window.addEventListener('keydown', function () {
+      };
+
+      this._onKeyDown = function () {
         _this.session.keydown += 1;
-      });
+      };
+
+      window.addEventListener('mousemove', this._onMouseMove);
+      window.addEventListener('keydown', this._onKeyDown);
     }
     /**
-     * Submits a form.
-     *
-     * @param {object} props
-     * @returns {object}
+     * Tears down the client instance.
      */
 
 
     createClass(StaticKit, [{
+      key: "teardown",
+      value: function teardown() {
+        window.removeEventListener('mousemove', this._onMouseMove);
+        window.removeEventListener('keydown', this._onKeyDown);
+      }
+      /**
+       * Submits a form.
+       *
+       * @param {object} props
+       * @returns {object}
+       */
+
+    }, {
       key: "submitForm",
       value: function () {
         var _submitForm = asyncToGenerator(
@@ -1395,7 +974,7 @@
                   endpoint = props.endpoint || 'https://api.statickit.com';
                   url = "".concat(endpoint, "/j/forms/").concat(props.id, "/submissions");
                   data = props.data || {};
-                  session = assign$1({}, this.session, {
+                  session = Object.assign({}, this.session, {
                     submittedAt: 1 * new Date()
                   });
                   append(data, '_t', encode(session));
@@ -1494,8 +1073,6 @@
       });
     };
   }
-
-  var commonjsGlobal$1 = typeof globalThis !== 'undefined' ? globalThis : typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : typeof self !== 'undefined' ? self : {};
 
   function createCommonjsModule$1(fn, module) {
   	return module = { exports: {} }, fn(module, module.exports), module.exports;
@@ -1608,10 +1185,10 @@
     return self;
   })();
 
-  var indexOf$1 = [].indexOf;
+  var indexOf = [].indexOf;
 
   var indexof = function(arr, obj){
-    if (indexOf$1) return arr.indexOf(obj);
+    if (indexOf) return arr.indexOf(obj);
     for (var i = 0; i < arr.length; ++i) {
       if (arr[i] === obj) return i;
     }
@@ -2924,476 +2501,42 @@
   }
   });
 
-  var O$1 = 'object';
-  var check$1 = function (it) {
-    return it && it.Math == Math && it;
-  };
-
-  // https://github.com/zloirock/core-js/issues/86#issuecomment-115759028
-  var global_1$1 =
-    // eslint-disable-next-line no-undef
-    check$1(typeof globalThis == O$1 && globalThis) ||
-    check$1(typeof window == O$1 && window) ||
-    check$1(typeof self == O$1 && self) ||
-    check$1(typeof commonjsGlobal$1 == O$1 && commonjsGlobal$1) ||
-    // eslint-disable-next-line no-new-func
-    Function('return this')();
-
-  var fails$1 = function (exec) {
-    try {
-      return !!exec();
-    } catch (error) {
-      return true;
-    }
-  };
-
-  // Thank's IE8 for his funny defineProperty
-  var descriptors$1 = !fails$1(function () {
-    return Object.defineProperty({}, 'a', { get: function () { return 7; } }).a != 7;
-  });
-
-  var nativePropertyIsEnumerable$1 = {}.propertyIsEnumerable;
-  var getOwnPropertyDescriptor$2 = Object.getOwnPropertyDescriptor;
-
-  // Nashorn ~ JDK8 bug
-  var NASHORN_BUG$1 = getOwnPropertyDescriptor$2 && !nativePropertyIsEnumerable$1.call({ 1: 2 }, 1);
-
-  // `Object.prototype.propertyIsEnumerable` method implementation
-  // https://tc39.github.io/ecma262/#sec-object.prototype.propertyisenumerable
-  var f$4 = NASHORN_BUG$1 ? function propertyIsEnumerable(V) {
-    var descriptor = getOwnPropertyDescriptor$2(this, V);
-    return !!descriptor && descriptor.enumerable;
-  } : nativePropertyIsEnumerable$1;
-
-  var objectPropertyIsEnumerable$1 = {
-  	f: f$4
-  };
-
-  var createPropertyDescriptor$1 = function (bitmap, value) {
-    return {
-      enumerable: !(bitmap & 1),
-      configurable: !(bitmap & 2),
-      writable: !(bitmap & 4),
-      value: value
-    };
-  };
-
-  var toString$1 = {}.toString;
-
-  var classofRaw$1 = function (it) {
-    return toString$1.call(it).slice(8, -1);
-  };
-
-  var split$1 = ''.split;
-
-  // fallback for non-array-like ES3 and non-enumerable old V8 strings
-  var indexedObject$1 = fails$1(function () {
-    // throws an error in rhino, see https://github.com/mozilla/rhino/issues/346
-    // eslint-disable-next-line no-prototype-builtins
-    return !Object('z').propertyIsEnumerable(0);
-  }) ? function (it) {
-    return classofRaw$1(it) == 'String' ? split$1.call(it, '') : Object(it);
-  } : Object;
-
-  // `RequireObjectCoercible` abstract operation
-  // https://tc39.github.io/ecma262/#sec-requireobjectcoercible
-  var requireObjectCoercible$1 = function (it) {
-    if (it == undefined) throw TypeError("Can't call method on " + it);
-    return it;
-  };
-
-  // toObject with fallback for non-array-like ES3 strings
-
-
-
-  var toIndexedObject$1 = function (it) {
-    return indexedObject$1(requireObjectCoercible$1(it));
-  };
-
-  var isObject$1 = function (it) {
-    return typeof it === 'object' ? it !== null : typeof it === 'function';
-  };
-
-  // `ToPrimitive` abstract operation
-  // https://tc39.github.io/ecma262/#sec-toprimitive
-  // instead of the ES6 spec version, we didn't implement @@toPrimitive case
-  // and the second argument - flag - preferred type is a string
-  var toPrimitive$1 = function (input, PREFERRED_STRING) {
-    if (!isObject$1(input)) return input;
-    var fn, val;
-    if (PREFERRED_STRING && typeof (fn = input.toString) == 'function' && !isObject$1(val = fn.call(input))) return val;
-    if (typeof (fn = input.valueOf) == 'function' && !isObject$1(val = fn.call(input))) return val;
-    if (!PREFERRED_STRING && typeof (fn = input.toString) == 'function' && !isObject$1(val = fn.call(input))) return val;
-    throw TypeError("Can't convert object to primitive value");
-  };
-
-  var hasOwnProperty$1 = {}.hasOwnProperty;
-
-  var has$1 = function (it, key) {
-    return hasOwnProperty$1.call(it, key);
-  };
-
-  var document$2 = global_1$1.document;
-  // typeof document.createElement is 'object' in old IE
-  var EXISTS$1 = isObject$1(document$2) && isObject$1(document$2.createElement);
-
-  var documentCreateElement$1 = function (it) {
-    return EXISTS$1 ? document$2.createElement(it) : {};
-  };
-
-  // Thank's IE8 for his funny defineProperty
-  var ie8DomDefine$1 = !descriptors$1 && !fails$1(function () {
-    return Object.defineProperty(documentCreateElement$1('div'), 'a', {
-      get: function () { return 7; }
-    }).a != 7;
-  });
-
-  var nativeGetOwnPropertyDescriptor$1 = Object.getOwnPropertyDescriptor;
-
-  // `Object.getOwnPropertyDescriptor` method
-  // https://tc39.github.io/ecma262/#sec-object.getownpropertydescriptor
-  var f$5 = descriptors$1 ? nativeGetOwnPropertyDescriptor$1 : function getOwnPropertyDescriptor(O, P) {
-    O = toIndexedObject$1(O);
-    P = toPrimitive$1(P, true);
-    if (ie8DomDefine$1) try {
-      return nativeGetOwnPropertyDescriptor$1(O, P);
-    } catch (error) { /* empty */ }
-    if (has$1(O, P)) return createPropertyDescriptor$1(!objectPropertyIsEnumerable$1.f.call(O, P), O[P]);
-  };
-
-  var objectGetOwnPropertyDescriptor$1 = {
-  	f: f$5
-  };
-
-  var replacement$1 = /#|\.prototype\./;
-
-  var isForced$1 = function (feature, detection) {
-    var value = data$2[normalize$1(feature)];
-    return value == POLYFILL$1 ? true
-      : value == NATIVE$1 ? false
-      : typeof detection == 'function' ? fails$1(detection)
-      : !!detection;
-  };
-
-  var normalize$1 = isForced$1.normalize = function (string) {
-    return String(string).replace(replacement$1, '.').toLowerCase();
-  };
-
-  var data$2 = isForced$1.data = {};
-  var NATIVE$1 = isForced$1.NATIVE = 'N';
-  var POLYFILL$1 = isForced$1.POLYFILL = 'P';
-
-  var isForced_1$1 = isForced$1;
-
-  var path$1 = {};
-
-  var aFunction$1 = function (it) {
-    if (typeof it != 'function') {
-      throw TypeError(String(it) + ' is not a function');
-    } return it;
-  };
-
-  // optional / simple context binding
-  var bindContext$1 = function (fn, that, length) {
-    aFunction$1(fn);
-    if (that === undefined) return fn;
-    switch (length) {
-      case 0: return function () {
-        return fn.call(that);
-      };
-      case 1: return function (a) {
-        return fn.call(that, a);
-      };
-      case 2: return function (a, b) {
-        return fn.call(that, a, b);
-      };
-      case 3: return function (a, b, c) {
-        return fn.call(that, a, b, c);
-      };
-    }
-    return function (/* ...args */) {
-      return fn.apply(that, arguments);
-    };
-  };
-
-  var anObject$1 = function (it) {
-    if (!isObject$1(it)) {
-      throw TypeError(String(it) + ' is not an object');
-    } return it;
-  };
-
-  var nativeDefineProperty$1 = Object.defineProperty;
-
-  // `Object.defineProperty` method
-  // https://tc39.github.io/ecma262/#sec-object.defineproperty
-  var f$6 = descriptors$1 ? nativeDefineProperty$1 : function defineProperty(O, P, Attributes) {
-    anObject$1(O);
-    P = toPrimitive$1(P, true);
-    anObject$1(Attributes);
-    if (ie8DomDefine$1) try {
-      return nativeDefineProperty$1(O, P, Attributes);
-    } catch (error) { /* empty */ }
-    if ('get' in Attributes || 'set' in Attributes) throw TypeError('Accessors not supported');
-    if ('value' in Attributes) O[P] = Attributes.value;
-    return O;
-  };
-
-  var objectDefineProperty$1 = {
-  	f: f$6
-  };
-
-  var hide$1 = descriptors$1 ? function (object, key, value) {
-    return objectDefineProperty$1.f(object, key, createPropertyDescriptor$1(1, value));
-  } : function (object, key, value) {
-    object[key] = value;
-    return object;
-  };
-
-  var getOwnPropertyDescriptor$3 = objectGetOwnPropertyDescriptor$1.f;
-
-
-
-
-
-
-  var wrapConstructor$1 = function (NativeConstructor) {
-    var Wrapper = function (a, b, c) {
-      if (this instanceof NativeConstructor) {
-        switch (arguments.length) {
-          case 0: return new NativeConstructor();
-          case 1: return new NativeConstructor(a);
-          case 2: return new NativeConstructor(a, b);
-        } return new NativeConstructor(a, b, c);
-      } return NativeConstructor.apply(this, arguments);
-    };
-    Wrapper.prototype = NativeConstructor.prototype;
-    return Wrapper;
-  };
-
-  /*
-    options.target      - name of the target object
-    options.global      - target is the global object
-    options.stat        - export as static methods of target
-    options.proto       - export as prototype methods of target
-    options.real        - real prototype method for the `pure` version
-    options.forced      - export even if the native feature is available
-    options.bind        - bind methods to the target, required for the `pure` version
-    options.wrap        - wrap constructors to preventing global pollution, required for the `pure` version
-    options.unsafe      - use the simple assignment of property instead of delete + defineProperty
-    options.sham        - add a flag to not completely full polyfills
-    options.enumerable  - export as enumerable property
-    options.noTargetGet - prevent calling a getter on target
-  */
-  var _export$1 = function (options, source) {
-    var TARGET = options.target;
-    var GLOBAL = options.global;
-    var STATIC = options.stat;
-    var PROTO = options.proto;
-
-    var nativeSource = GLOBAL ? global_1$1 : STATIC ? global_1$1[TARGET] : (global_1$1[TARGET] || {}).prototype;
-
-    var target = GLOBAL ? path$1 : path$1[TARGET] || (path$1[TARGET] = {});
-    var targetPrototype = target.prototype;
-
-    var FORCED, USE_NATIVE, VIRTUAL_PROTOTYPE;
-    var key, sourceProperty, targetProperty, nativeProperty, resultProperty, descriptor;
-
-    for (key in source) {
-      FORCED = isForced_1$1(GLOBAL ? key : TARGET + (STATIC ? '.' : '#') + key, options.forced);
-      // contains in native
-      USE_NATIVE = !FORCED && nativeSource && has$1(nativeSource, key);
-
-      targetProperty = target[key];
-
-      if (USE_NATIVE) if (options.noTargetGet) {
-        descriptor = getOwnPropertyDescriptor$3(nativeSource, key);
-        nativeProperty = descriptor && descriptor.value;
-      } else nativeProperty = nativeSource[key];
-
-      // export native or implementation
-      sourceProperty = (USE_NATIVE && nativeProperty) ? nativeProperty : source[key];
-
-      if (USE_NATIVE && typeof targetProperty === typeof sourceProperty) continue;
-
-      // bind timers to global for call from export context
-      if (options.bind && USE_NATIVE) resultProperty = bindContext$1(sourceProperty, global_1$1);
-      // wrap global constructors for prevent changs in this version
-      else if (options.wrap && USE_NATIVE) resultProperty = wrapConstructor$1(sourceProperty);
-      // make static versions for prototype methods
-      else if (PROTO && typeof sourceProperty == 'function') resultProperty = bindContext$1(Function.call, sourceProperty);
-      // default case
-      else resultProperty = sourceProperty;
-
-      // add a flag to not completely full polyfills
-      if (options.sham || (sourceProperty && sourceProperty.sham) || (targetProperty && targetProperty.sham)) {
-        hide$1(resultProperty, 'sham', true);
-      }
-
-      target[key] = resultProperty;
-
-      if (PROTO) {
-        VIRTUAL_PROTOTYPE = TARGET + 'Prototype';
-        if (!has$1(path$1, VIRTUAL_PROTOTYPE)) hide$1(path$1, VIRTUAL_PROTOTYPE, {});
-        // export virtual prototype methods
-        path$1[VIRTUAL_PROTOTYPE][key] = sourceProperty;
-        // export real prototype methods
-        if (options.real && targetPrototype && !targetPrototype[key]) hide$1(targetPrototype, key, sourceProperty);
-      }
-    }
-  };
-
-  var ceil$1 = Math.ceil;
-  var floor$1 = Math.floor;
-
-  // `ToInteger` abstract operation
-  // https://tc39.github.io/ecma262/#sec-tointeger
-  var toInteger$1 = function (argument) {
-    return isNaN(argument = +argument) ? 0 : (argument > 0 ? floor$1 : ceil$1)(argument);
-  };
-
-  var min$2 = Math.min;
-
-  // `ToLength` abstract operation
-  // https://tc39.github.io/ecma262/#sec-tolength
-  var toLength$1 = function (argument) {
-    return argument > 0 ? min$2(toInteger$1(argument), 0x1FFFFFFFFFFFFF) : 0; // 2 ** 53 - 1 == 9007199254740991
-  };
-
-  var max$1 = Math.max;
-  var min$3 = Math.min;
-
-  // Helper for a popular repeating case of the spec:
-  // Let integer be ? ToInteger(index).
-  // If integer < 0, let result be max((length + integer), 0); else let result be min(length, length).
-  var toAbsoluteIndex$1 = function (index, length) {
-    var integer = toInteger$1(index);
-    return integer < 0 ? max$1(integer + length, 0) : min$3(integer, length);
-  };
-
-  // `Array.prototype.{ indexOf, includes }` methods implementation
-  var createMethod$1 = function (IS_INCLUDES) {
-    return function ($this, el, fromIndex) {
-      var O = toIndexedObject$1($this);
-      var length = toLength$1(O.length);
-      var index = toAbsoluteIndex$1(fromIndex, length);
-      var value;
-      // Array#includes uses SameValueZero equality algorithm
-      // eslint-disable-next-line no-self-compare
-      if (IS_INCLUDES && el != el) while (length > index) {
-        value = O[index++];
-        // eslint-disable-next-line no-self-compare
-        if (value != value) return true;
-      // Array#indexOf ignores holes, Array#includes - not
-      } else for (;length > index; index++) {
-        if ((IS_INCLUDES || index in O) && O[index] === el) return IS_INCLUDES || index || 0;
-      } return !IS_INCLUDES && -1;
-    };
-  };
-
-  var arrayIncludes$1 = {
-    // `Array.prototype.includes` method
-    // https://tc39.github.io/ecma262/#sec-array.prototype.includes
-    includes: createMethod$1(true),
-    // `Array.prototype.indexOf` method
-    // https://tc39.github.io/ecma262/#sec-array.prototype.indexof
-    indexOf: createMethod$1(false)
-  };
-
-  var hiddenKeys$1 = {};
-
-  var indexOf$2 = arrayIncludes$1.indexOf;
-
-
-  var objectKeysInternal$1 = function (object, names) {
-    var O = toIndexedObject$1(object);
-    var i = 0;
-    var result = [];
-    var key;
-    for (key in O) !has$1(hiddenKeys$1, key) && has$1(O, key) && result.push(key);
-    // Don't enum bug & hidden keys
-    while (names.length > i) if (has$1(O, key = names[i++])) {
-      ~indexOf$2(result, key) || result.push(key);
-    }
-    return result;
-  };
-
-  // IE8- don't enum bug keys
-  var enumBugKeys$1 = [
-    'constructor',
-    'hasOwnProperty',
-    'isPrototypeOf',
-    'propertyIsEnumerable',
-    'toLocaleString',
-    'toString',
-    'valueOf'
-  ];
-
-  // `Object.keys` method
-  // https://tc39.github.io/ecma262/#sec-object.keys
-  var objectKeys$1 = Object.keys || function keys(O) {
-    return objectKeysInternal$1(O, enumBugKeys$1);
-  };
-
-  var f$7 = Object.getOwnPropertySymbols;
-
-  var objectGetOwnPropertySymbols$1 = {
-  	f: f$7
-  };
-
-  // `ToObject` abstract operation
-  // https://tc39.github.io/ecma262/#sec-toobject
-  var toObject$1 = function (argument) {
-    return Object(requireObjectCoercible$1(argument));
-  };
-
-  var nativeAssign$1 = Object.assign;
-
-  // `Object.assign` method
-  // https://tc39.github.io/ecma262/#sec-object.assign
-  // should work with symbols and should have deterministic property order (V8 bug)
-  var objectAssign$1 = !nativeAssign$1 || fails$1(function () {
-    var A = {};
-    var B = {};
-    // eslint-disable-next-line no-undef
-    var symbol = Symbol();
-    var alphabet = 'abcdefghijklmnopqrst';
-    A[symbol] = 7;
-    alphabet.split('').forEach(function (chr) { B[chr] = chr; });
-    return nativeAssign$1({}, A)[symbol] != 7 || objectKeys$1(nativeAssign$1({}, B)).join('') != alphabet;
-  }) ? function assign(target, source) { // eslint-disable-line no-unused-vars
-    var T = toObject$1(target);
-    var argumentsLength = arguments.length;
-    var index = 1;
-    var getOwnPropertySymbols = objectGetOwnPropertySymbols$1.f;
-    var propertyIsEnumerable = objectPropertyIsEnumerable$1.f;
-    while (argumentsLength > index) {
-      var S = indexedObject$1(arguments[index++]);
-      var keys = getOwnPropertySymbols ? objectKeys$1(S).concat(getOwnPropertySymbols(S)) : objectKeys$1(S);
-      var length = keys.length;
-      var j = 0;
-      var key;
-      while (length > j) {
-        key = keys[j++];
-        if (!descriptors$1 || propertyIsEnumerable.call(S, key)) T[key] = S[key];
-      }
-    } return T;
-  } : nativeAssign$1;
-
-  // `Object.assign` method
-  // https://tc39.github.io/ecma262/#sec-object.assign
-  _export$1({ target: 'Object', stat: true, forced: Object.assign !== objectAssign$1 }, {
-    assign: objectAssign$1
-  });
-
-  var assign$2 = path$1.Object.assign;
-
-  var assign$3 = assign$2;
-
   var toCamel = function toCamel(s) {
     return s.replace(/([-_][a-z])/gi, function ($1) {
       return $1.toUpperCase().replace('-', '').replace('_', '');
     });
   };
+
+  if (typeof Object.assign !== 'function') {
+    // Must be writable: true, enumerable: false, configurable: true
+    Object.defineProperty(Object, 'assign', {
+      value: function assign(target, varArgs) {
+
+        if (target === null || target === undefined) {
+          throw new TypeError('Cannot convert undefined or null to object');
+        }
+
+        var to = Object(target);
+
+        for (var index = 1; index < arguments.length; index++) {
+          var nextSource = arguments[index];
+
+          if (nextSource !== null && nextSource !== undefined) {
+            for (var nextKey in nextSource) {
+              // Avoid bugs when hasOwnProperty is shadowed
+              if (Object.prototype.hasOwnProperty.call(nextSource, nextKey)) {
+                to[nextKey] = nextSource[nextKey];
+              }
+            }
+          }
+        }
+
+        return to;
+      },
+      writable: true,
+      configurable: true
+    });
+  }
 
   var onSuccess = function onSuccess(config, _resp) {
     var h = config.h,
@@ -3592,7 +2735,7 @@
     if (!props.element) throw new Error('You must define an `element` property');
     var form = getFormElement(props.element);
     if (!form) throw new Error("Element `".concat(props.element, "` not found"));
-    var config = assign$3({}, defaults, props, {
+    var config = Object.assign({}, defaults, props, {
       form: form
     });
     return setup(client, config);

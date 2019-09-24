@@ -1,6 +1,6 @@
 import h from 'hyperscript';
-import assign from 'core-js-pure/features/object/assign';
 import { toCamel } from './utils';
+import './polyfills';
 
 const onSuccess = (config, _resp) => {
   const { h, form } = config;
@@ -159,7 +159,7 @@ const init = (client, props) => {
   const form = getFormElement(props.element);
   if (!form) throw new Error(`Element \`${props.element}\` not found`);
 
-  const config = assign({}, defaults, props, { form });
+  const config = Object.assign({}, defaults, props, { form });
   return setup(client, config);
 };
 
