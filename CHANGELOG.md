@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.0.0-beta.10
+
+- Update StaticKit Core
+- Remove `core-js` dependency in favor of simply pulling in specific polyfills.
+
 ## 1.0.0-beta.9
 
 - [Refactoring] Use the `@statickit/core` library.
