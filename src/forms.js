@@ -51,7 +51,7 @@ const renderErrors = (config, errors) => {
   });
 };
 
-const submit = async (client, config) => {
+const submit = (client, config) => {
   const {
     id,
     form,
@@ -85,28 +85,30 @@ const submit = async (client, config) => {
 
   if (config.debug) console.log(id, 'Submitting');
 
-  try {
-    const result = await client.submitForm({
+  return client
+    .submitForm({
       id: id,
       endpoint: endpoint,
       data: formData
+    })
+    .then(({ body, response }) => {
+      if (response.status == 200) {
+        if (config.debug) console.log(id, 'Submitted', result);
+        onSuccess(config, body);
+      } else {
+        const errors = body.errors;
+        if (config.debug) console.log(id, 'Validation error', result);
+        renderErrors(config, errors);
+        onError(config, errors);
+      }
+    })
+    .catch(e => {
+      if (config.debug) console.log(id, 'Unexpected error', e);
+      onFailure(config, e);
+    })
+    .finally(() => {
+      enable(config);
     });
-
-    if (result.response.status == 200) {
-      if (config.debug) console.log(id, 'Submitted', result);
-      onSuccess(config, result.body);
-    } else {
-      const errors = result.body.errors;
-      if (config.debug) console.log(id, 'Validation error', result);
-      renderErrors(config, errors);
-      onError(config, errors);
-    }
-  } catch (e) {
-    if (config.debug) console.log(id, 'Unexpected error', e);
-    onFailure(config, e);
-  } finally {
-    enable(config);
-  }
 };
 
 /**
@@ -133,9 +135,9 @@ const setup = (client, config) => {
 
   if (config.debug) console.log(id, 'Initializing');
 
-  form.addEventListener('submit', async ev => {
+  form.addEventListener('submit', ev => {
     ev.preventDefault();
-    await submit(client, config);
+    submit(client, config);
     return true;
   });
 
