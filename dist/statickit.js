@@ -2453,36 +2453,94 @@ var statickit = (function () {
     });
   };
 
-  if (typeof Object.assign !== 'function') {
-    // Must be writable: true, enumerable: false, configurable: true
-    Object.defineProperty(Object, 'assign', {
-      value: function assign(target, varArgs) {
+  /*
+  object-assign
+  (c) Sindre Sorhus
+  @license MIT
+  */
+  /* eslint-disable no-unused-vars */
+  var getOwnPropertySymbols$1 = Object.getOwnPropertySymbols;
+  var hasOwnProperty$1 = Object.prototype.hasOwnProperty;
+  var propIsEnumerable$1 = Object.prototype.propertyIsEnumerable;
 
-        if (target === null || target === undefined) {
-          throw new TypeError('Cannot convert undefined or null to object');
-        }
+  function toObject$1(val) {
+  	if (val === null || val === undefined) {
+  		throw new TypeError('Object.assign cannot be called with null or undefined');
+  	}
 
-        var to = Object(target);
-
-        for (var index = 1; index < arguments.length; index++) {
-          var nextSource = arguments[index];
-
-          if (nextSource !== null && nextSource !== undefined) {
-            for (var nextKey in nextSource) {
-              // Avoid bugs when hasOwnProperty is shadowed
-              if (Object.prototype.hasOwnProperty.call(nextSource, nextKey)) {
-                to[nextKey] = nextSource[nextKey];
-              }
-            }
-          }
-        }
-
-        return to;
-      },
-      writable: true,
-      configurable: true
-    });
+  	return Object(val);
   }
+
+  function shouldUseNative$1() {
+  	try {
+  		if (!Object.assign) {
+  			return false;
+  		}
+
+  		// Detect buggy property enumeration order in older V8 versions.
+
+  		// https://bugs.chromium.org/p/v8/issues/detail?id=4118
+  		var test1 = new String('abc');  // eslint-disable-line no-new-wrappers
+  		test1[5] = 'de';
+  		if (Object.getOwnPropertyNames(test1)[0] === '5') {
+  			return false;
+  		}
+
+  		// https://bugs.chromium.org/p/v8/issues/detail?id=3056
+  		var test2 = {};
+  		for (var i = 0; i < 10; i++) {
+  			test2['_' + String.fromCharCode(i)] = i;
+  		}
+  		var order2 = Object.getOwnPropertyNames(test2).map(function (n) {
+  			return test2[n];
+  		});
+  		if (order2.join('') !== '0123456789') {
+  			return false;
+  		}
+
+  		// https://bugs.chromium.org/p/v8/issues/detail?id=3056
+  		var test3 = {};
+  		'abcdefghijklmnopqrst'.split('').forEach(function (letter) {
+  			test3[letter] = letter;
+  		});
+  		if (Object.keys(Object.assign({}, test3)).join('') !==
+  				'abcdefghijklmnopqrst') {
+  			return false;
+  		}
+
+  		return true;
+  	} catch (err) {
+  		// We don't expect any of the above to throw, but better to be safe.
+  		return false;
+  	}
+  }
+
+  var objectAssign$1 = shouldUseNative$1() ? Object.assign : function (target, source) {
+  	var from;
+  	var to = toObject$1(target);
+  	var symbols;
+
+  	for (var s = 1; s < arguments.length; s++) {
+  		from = Object(arguments[s]);
+
+  		for (var key in from) {
+  			if (hasOwnProperty$1.call(from, key)) {
+  				to[key] = from[key];
+  			}
+  		}
+
+  		if (getOwnPropertySymbols$1) {
+  			symbols = getOwnPropertySymbols$1(from);
+  			for (var i = 0; i < symbols.length; i++) {
+  				if (propIsEnumerable$1.call(from, symbols[i])) {
+  					to[symbols[i]] = from[symbols[i]];
+  				}
+  			}
+  		}
+  	}
+
+  	return to;
+  };
 
   var onSuccess = function onSuccess(config, _resp) {
     var h = config.h,
@@ -2563,15 +2621,12 @@ var statickit = (function () {
       id: id,
       endpoint: endpoint,
       data: formData
-    }).then(function (_ref) {
-      var body = _ref.body,
-          response = _ref.response;
-
-      if (response.status == 200) {
+    }).then(function (result) {
+      if (result.response.status == 200) {
         if (config.debug) console.log(id, 'Submitted', result);
-        onSuccess(config, body);
+        onSuccess(config, result.body);
       } else {
-        var errors = body.errors;
+        var errors = result.body.errors;
         if (config.debug) console.log(id, 'Validation error', result);
         renderErrors(config, errors);
         onError(config, errors);
@@ -2633,7 +2688,7 @@ var statickit = (function () {
     if (!props.element) throw new Error('You must define an `element` property');
     var form = getFormElement(props.element);
     if (!form) throw new Error("Element `".concat(props.element, "` not found"));
-    var config = Object.assign({}, defaults, props, {
+    var config = objectAssign$1({}, defaults, props, {
       form: form
     });
     return setup(client, config);

@@ -1,6 +1,6 @@
 import h from 'hyperscript';
 import { toCamel } from './utils';
-import './polyfills';
+import objectAssign from 'object-assign';
 
 const onSuccess = (config, _resp) => {
   const { h, form } = config;
@@ -91,12 +91,12 @@ const submit = (client, config) => {
       endpoint: endpoint,
       data: formData
     })
-    .then(({ body, response }) => {
-      if (response.status == 200) {
+    .then(result => {
+      if (result.response.status == 200) {
         if (config.debug) console.log(id, 'Submitted', result);
-        onSuccess(config, body);
+        onSuccess(config, result.body);
       } else {
-        const errors = body.errors;
+        const errors = result.body.errors;
         if (config.debug) console.log(id, 'Validation error', result);
         renderErrors(config, errors);
         onError(config, errors);
@@ -161,7 +161,7 @@ const init = (client, props) => {
   const form = getFormElement(props.element);
   if (!form) throw new Error(`Element \`${props.element}\` not found`);
 
-  const config = Object.assign({}, defaults, props, { form });
+  const config = objectAssign({}, defaults, props, { form });
   return setup(client, config);
 };
 
