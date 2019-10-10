@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.0.0-beta.12
+
+- Update core to v1.3.0.
+- Use `object-assign` ponyfill instead of global polyfill.
+
 ## 1.0.0-beta.11
 
 - Update StaticKit Core (update base64 polyfill)
