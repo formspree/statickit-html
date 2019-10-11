@@ -2,8 +2,9 @@
 
 ## 1.0.0-beta.12
 
-- Update core to v1.3.0.
+- Update core to v1.3.1.
 - Use `object-assign` ponyfill instead of global polyfill.
+- Clean up npm packaging.
 
 ## 1.0.0-beta.11
 
