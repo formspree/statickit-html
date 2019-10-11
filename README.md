@@ -7,7 +7,7 @@ The HTML library for [StaticKit](https://statickit.com).
 Run the following to install via npm:
 
 ```
-npm install @statickit/standalone
+npm install @statickit/html
 ```
 
 If you are not using an npm-based build pipeline, you can install using our CDN instead:
@@ -34,7 +34,7 @@ Here's a simple example of a StaticKit-powered form:
 If you are using the npm package:
 
 ```js
-import sk from '@statickit/standalone';
+import sk from '@statickit/html';
 
 sk('form', 'init', {
   id: '[...]',
@@ -46,7 +46,11 @@ If you are using the CDN:
 
 ```html
 <script>
-  window.sk=window.sk||function(){(sk.q=sk.q||[]).push(arguments)};
+  window.sk =
+    window.sk ||
+    function() {
+      (sk.q = sk.q || []).push(arguments);
+    };
 
   sk('form', 'init', {
     id: '[...]',
