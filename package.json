@@ -9,11 +9,18 @@
     "type": "git",
     "url": "https://github.com/unstacked/statickit-standalone.git"
   },
-  "main": "dist/statickit.umd.js",
   "module": "dist/statickit.esm.js",
+  "main": "dist/statickit.cjs.js",
+  "files": [
+    "dist/statickit.esm.js",
+    "dist/statickit.cjs.js",
+    "public/statickit.js",
+    "public/statickit.min.js"
+  ],
   "scripts": {
     "build": "rollup -c",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "prepublish": "npm run build"
   },
   "devDependencies": {
     "@babel/cli": "^7.4.4",
