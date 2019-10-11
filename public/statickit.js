@@ -2589,7 +2589,7 @@ var statickit = (function () {
     });
   };
 
-  var submit = function submit(client, config) {
+  var submit = function submit(config) {
     var id = config.id,
         form = config.form,
         enable = config.enable,
@@ -2599,7 +2599,8 @@ var statickit = (function () {
         onSuccess = config.onSuccess,
         onError = config.onError,
         endpoint = config.endpoint,
-        data = config.data;
+        data = config.data,
+        client = config.client;
     var formData = new FormData(form); // Append data from config
 
     if (_typeof(data) === 'object') {
@@ -2659,7 +2660,7 @@ var statickit = (function () {
     debug: false
   };
 
-  var setup = function setup(client, config) {
+  var setup = function setup(config) {
     var id = config.id,
         form = config.form,
         onInit = config.onInit,
@@ -2667,7 +2668,7 @@ var statickit = (function () {
     if (config.debug) console.log(id, 'Initializing');
     form.addEventListener('submit', function (ev) {
       ev.preventDefault();
-      submit(client, config);
+      submit(config);
       return true;
     });
     enable(config);
@@ -2683,7 +2684,7 @@ var statickit = (function () {
     }
   };
 
-  var init = function init(client, props) {
+  var init = function init(props) {
     if (!props.id) throw new Error('You must define an `id` property');
     if (!props.element) throw new Error('You must define an `element` property');
     var form = getFormElement(props.element);
@@ -2691,7 +2692,7 @@ var statickit = (function () {
     var config = objectAssign$1({}, defaults, props, {
       form: form
     });
-    return setup(client, config);
+    return setup(config);
   };
 
   var forms = {
@@ -2720,16 +2721,20 @@ var statickit = (function () {
 
       var props = args[0];
 
+      if (!props.client) {
+        props.client = client;
+      }
+
       switch (method) {
         case 'init':
-          return forms.init(client, props);
+          return forms.init(props);
 
         default:
           // To retain backwards compatiblilty with
           // setting `element` selector as the second
           // argument: sk('form', '#myform', { ... })
           props.element = method;
-          return forms.init(client, props);
+          return forms.init(props);
       }
     }
   };

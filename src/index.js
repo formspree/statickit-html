@@ -19,16 +19,20 @@ const api = {
   form: (method, ...args) => {
     const [props] = args;
 
+    if (!props.client) {
+      props.client = client;
+    }
+
     switch (method) {
       case 'init':
-        return forms.init(client, props);
+        return forms.init(props);
 
       default:
         // To retain backwards compatiblilty with
         // setting `element` selector as the second
         // argument: sk('form', '#myform', { ... })
         props.element = method;
-        return forms.init(client, props);
+        return forms.init(props);
     }
   }
 };

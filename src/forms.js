@@ -51,7 +51,7 @@ const renderErrors = (config, errors) => {
   });
 };
 
-const submit = (client, config) => {
+const submit = config => {
   const {
     id,
     form,
@@ -62,7 +62,8 @@ const submit = (client, config) => {
     onSuccess,
     onError,
     endpoint,
-    data
+    data,
+    client
   } = config;
 
   const formData = new FormData(form);
@@ -130,14 +131,14 @@ const defaults = {
   debug: false
 };
 
-const setup = (client, config) => {
+const setup = config => {
   const { id, form, onInit, enable } = config;
 
   if (config.debug) console.log(id, 'Initializing');
 
   form.addEventListener('submit', ev => {
     ev.preventDefault();
-    submit(client, config);
+    submit(config);
     return true;
   });
 
@@ -154,7 +155,7 @@ const getFormElement = nodeOrSelector => {
   }
 };
 
-const init = (client, props) => {
+const init = props => {
   if (!props.id) throw new Error('You must define an `id` property');
   if (!props.element) throw new Error('You must define an `element` property');
 
@@ -162,7 +163,7 @@ const init = (client, props) => {
   if (!form) throw new Error(`Element \`${props.element}\` not found`);
 
   const config = objectAssign({}, defaults, props, { form });
-  return setup(client, config);
+  return setup(config);
 };
 
 export default { init };
