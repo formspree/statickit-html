@@ -1,5 +1,23 @@
 import sk from '../src';
 
+const successClient = data => ({
+  submitForm: _props => {
+    return new Promise(resolve => {
+      resolve({ body: data, response: { status: 200 } });
+    });
+  },
+  teardown: () => {}
+});
+
+const errorClient = data => ({
+  submitForm: _props => {
+    return new Promise(resolve => {
+      resolve({ body: data, response: { status: 422 } });
+    });
+  },
+  teardown: () => {}
+});
+
 let container;
 
 beforeEach(() => {
@@ -19,28 +37,19 @@ it('calls the success callback', () => {
   `;
 
   const form = container.querySelector('form');
-  const responseData = { id: '000', data: { email: 'test@example.com' } };
-
-  const mockClient = {
-    submitForm: _props => {
-      return new Promise(resolve => {
-        resolve({ body: responseData, response: { status: 200 } });
-      });
-    },
-    teardown: () => {}
-  };
+  const data = { id: '000', data: { email: 'test@example.com' } };
 
   const result = new Promise(resolve => {
     sk('form', 'init', {
       id: 'xxx',
       element: '#my-form',
-      client: mockClient,
+      client: successClient(data),
       onSuccess: (config, response) => {
         resolve({ config, response });
       }
     });
   }).then(({ response }) => {
-    expect(response).toBe(responseData);
+    expect(response).toBe(data);
   });
 
   form.dispatchEvent(new Event('submit'));
@@ -56,7 +65,7 @@ it('renders errors', () => {
   `;
 
   const form = container.querySelector('form');
-  const responseData = {
+  const data = {
     errors: [
       {
         field: 'email',
@@ -66,30 +75,109 @@ it('renders errors', () => {
     ]
   };
 
-  const mockClient = {
-    submitForm: _props => {
-      return new Promise(resolve => {
-        resolve({ body: responseData, response: { status: 422 } });
-      });
-    },
-    teardown: () => {}
-  };
-
   const result = new Promise(resolve => {
     sk('form', 'init', {
       id: 'xxx',
       element: '#my-form',
-      client: mockClient,
+      client: errorClient(data),
       onError: (config, errors) => {
         resolve({ config, errors });
       }
     });
   }).then(({ errors }) => {
     const errorElement = container.querySelector('[data-sk-error]');
-    expect(errors).toBe(responseData.errors);
+    expect(errors).toBe(data.errors);
     expect(errorElement.textContent).toBe(
       'This field must be an email address'
     );
+  });
+
+  form.dispatchEvent(new Event('submit'));
+
+  return result;
+});
+
+it('renders pretty name in error messages', () => {
+  container.innerHTML = `
+    <form id="my-form">
+      <div data-sk-error="email"></div>
+    </form>
+  `;
+
+  const form = container.querySelector('form');
+  const data = {
+    errors: [
+      {
+        field: 'email',
+        code: 'EMAIL_FORMAT',
+        message: 'must be an email address'
+      }
+    ]
+  };
+
+  const result = new Promise(resolve => {
+    sk('form', 'init', {
+      id: 'xxx',
+      element: '#my-form',
+      client: errorClient(data),
+      fields: {
+        email: {
+          prettyName: 'Email'
+        }
+      },
+      onError: (config, errors) => {
+        resolve({ config, errors });
+      }
+    });
+  }).then(({ errors }) => {
+    const errorElement = container.querySelector('[data-sk-error]');
+    expect(errors).toBe(data.errors);
+    expect(errorElement.textContent).toBe('Email must be an email address');
+  });
+
+  form.dispatchEvent(new Event('submit'));
+
+  return result;
+});
+
+it('renders custom error messages', () => {
+  container.innerHTML = `
+    <form id="my-form">
+      <div data-sk-error="email"></div>
+    </form>
+  `;
+
+  const form = container.querySelector('form');
+  const data = {
+    errors: [
+      {
+        field: 'email',
+        code: 'EMAIL_FORMAT',
+        message: 'must be an email address'
+      }
+    ]
+  };
+
+  const result = new Promise(resolve => {
+    sk('form', 'init', {
+      id: 'xxx',
+      element: '#my-form',
+      client: errorClient(data),
+      fields: {
+        email: {
+          errorMessages: {
+            emailFormat: 'Oops! This email is not valid.'
+          }
+        }
+      },
+      onError: (config, errors) => {
+        resolve({ config, errors });
+      }
+    });
+  }).then(({ errors }) => {
+    const errorElement = container.querySelector('[data-sk-error]');
+    expect(errors).toBe(data.errors);
+    expect(errorElement.textContent).toBe('Oops! This email is not valid.');
   });
 
   form.dispatchEvent(new Event('submit'));
