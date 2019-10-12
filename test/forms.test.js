@@ -30,6 +30,30 @@ afterEach(() => {
   container = null;
 });
 
+it('fails to init if element is not given', () => {
+  expect.assertions(1);
+
+  try {
+    sk('form', 'init', {
+      id: 'xxx'
+    });
+  } catch (e) {
+    expect(e.message).toBe('You must define an `element` property');
+  }
+});
+
+it('fails to init if id is not given', () => {
+  expect.assertions(1);
+
+  try {
+    sk('form', 'init', {
+      element: '#my-form'
+    });
+  } catch (e) {
+    expect(e.message).toBe('You must define an `id` property');
+  }
+});
+
 it('calls the success callback', () => {
   container.innerHTML = `
     <form id="my-form">
