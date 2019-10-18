@@ -2591,6 +2591,8 @@ var statickit = (function () {
 
   var submit = function submit(config) {
     var id = config.id,
+        site = config.site,
+        key = config.key,
         form = config.form,
         enable = config.enable,
         disable = config.disable,
@@ -2617,23 +2619,25 @@ var statickit = (function () {
     renderErrors(config, []);
     disable(config);
     onSubmit(config);
-    if (config.debug) console.log(id, 'Submitting');
+    if (config.debug) console.log('Submitting', config);
     return client.submitForm({
       id: id,
+      site: site,
+      key: key,
       endpoint: endpoint,
       data: formData
     }).then(function (result) {
       if (result.response.status == 200) {
-        if (config.debug) console.log(id, 'Submitted', result);
+        if (config.debug) console.log('Submitted', result);
         onSuccess(config, result.body);
       } else {
         var errors = result.body.errors;
-        if (config.debug) console.log(id, 'Validation error', result);
+        if (config.debug) console.log('Validation error', result);
         renderErrors(config, errors);
         onError(config, errors);
       }
     })["catch"](function (e) {
-      if (config.debug) console.log(id, 'Unexpected error', e);
+      if (config.debug) console.log('Unexpected error', e);
       onFailure(config, e);
     })["finally"](function () {
       enable(config);
@@ -2661,11 +2665,10 @@ var statickit = (function () {
   };
 
   var setup = function setup(config) {
-    var id = config.id,
-        form = config.form,
+    var form = config.form,
         onInit = config.onInit,
         enable = config.enable;
-    if (config.debug) console.log(id, 'Initializing');
+    if (config.debug) console.log('Initializing form', config);
     form.addEventListener('submit', function (ev) {
       ev.preventDefault();
       submit(config);
@@ -2685,8 +2688,8 @@ var statickit = (function () {
   };
 
   var init = function init(props) {
-    if (!props.id) throw new Error('You must define an `id` property');
-    if (!props.element) throw new Error('You must define an `element` property');
+    if (!props.id && !(props.site && props.key)) throw new Error('You must set an `id` or `site` & `key` properties');
+    if (!props.element) throw new Error('You must set an `element` property');
     var form = getFormElement(props.element);
     if (!form) throw new Error("Element `".concat(props.element, "` not found"));
     var config = objectAssign$1({}, defaults, props, {
