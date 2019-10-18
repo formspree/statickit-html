@@ -3,6 +3,12 @@
   "version": "1.0.0",
   "description": "The HTML client library for StaticKit",
   "homepage": "https://statickit.com/docs/html",
+  "keywords": [
+    "statickit"
+  ],
+  "bugs": {
+    "url": "https://github.com/unstacked/statickit-html/issues"
+  },
   "author": "Derrick Reimer",
   "license": "MIT",
   "repository": {
