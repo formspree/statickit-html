@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.1.0
+
+- Accept `site` + `form` combo (in lieu of `id`) for identifying forms.
+
+## 1.0.0
+
+- Release 1.0.0
+
 ## 1.0.0-beta.12
 
 - Update core to v1.3.1.
