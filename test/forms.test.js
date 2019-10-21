@@ -1,7 +1,12 @@
 import sk from '../src';
 
-const successClient = data => ({
-  submitForm: _props => {
+const successClient = (data, opts) => ({
+  submitForm: props => {
+    // A hook for making assertions about the properties
+    if (typeof opts.onSubmitForm === 'function') {
+      opts.onSubmitForm(props);
+    }
+
     return new Promise(resolve => {
       resolve({ body: data, response: { status: 200 } });
     });
@@ -38,7 +43,7 @@ it('fails to init if element is not given', () => {
       id: 'xxx'
     });
   } catch (e) {
-    expect(e.message).toBe('You must define an `element` property');
+    expect(e.message).toBe('You must set an `element` property');
   }
 });
 
@@ -50,8 +55,31 @@ it('fails to init if id is not given', () => {
       element: '#my-form'
     });
   } catch (e) {
-    expect(e.message).toBe('You must define an `id` property');
+    expect(e.message).toBe(
+      'You must set an `id` or `site` & `form` properties'
+    );
   }
+});
+
+it('initializes with site and form', () => {
+  container.innerHTML = `
+    <form id="my-form">
+    </form>
+  `;
+
+  return new Promise(resolve => {
+    sk('form', 'init', {
+      site: 'yyy',
+      form: 'zzz',
+      element: '#my-form',
+      onInit: config => {
+        resolve(config);
+      }
+    });
+  }).then(config => {
+    expect(config.site).toBe('yyy');
+    expect(config.key).toBe('zzz');
+  });
 });
 
 it('calls the success callback', () => {
@@ -63,11 +91,22 @@ it('calls the success callback', () => {
   const form = container.querySelector('form');
   const data = { id: '000', data: { email: 'test@example.com' } };
 
+  const client = successClient(data, {
+    onSubmitForm: props => {
+      // Passes all form identifying attributes
+      expect(props.id).toBe('xxx');
+      expect(props.site).toBe('yyy');
+      expect(props.form).toBe('zzz');
+    }
+  });
+
   const result = new Promise(resolve => {
     sk('form', 'init', {
       id: 'xxx',
+      site: 'yyy',
+      form: 'zzz',
       element: '#my-form',
-      client: successClient(data),
+      client: client,
       onSuccess: (config, response) => {
         resolve({ config, response });
       }

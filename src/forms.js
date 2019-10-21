@@ -54,6 +54,8 @@ const renderErrors = (config, errors) => {
 const submit = config => {
   const {
     id,
+    site,
+    key,
     form,
     enable,
     disable,
@@ -84,27 +86,29 @@ const submit = config => {
   disable(config);
   onSubmit(config);
 
-  if (config.debug) console.log(id, 'Submitting');
+  if (config.debug) console.log('Submitting', config);
 
   return client
     .submitForm({
       id: id,
+      site: site,
+      form: key,
       endpoint: endpoint,
       data: formData
     })
     .then(result => {
       if (result.response.status == 200) {
-        if (config.debug) console.log(id, 'Submitted', result);
+        if (config.debug) console.log('Submitted', result);
         onSuccess(config, result.body);
       } else {
         const errors = result.body.errors;
-        if (config.debug) console.log(id, 'Validation error', result);
+        if (config.debug) console.log('Validation error', result);
         renderErrors(config, errors);
         onError(config, errors);
       }
     })
     .catch(e => {
-      if (config.debug) console.log(id, 'Unexpected error', e);
+      if (config.debug) console.log('Unexpected error', e);
       onFailure(config, e);
     })
     .finally(() => {
@@ -132,9 +136,9 @@ const defaults = {
 };
 
 const setup = config => {
-  const { id, form, onInit, enable } = config;
+  const { form, onInit, enable } = config;
 
-  if (config.debug) console.log(id, 'Initializing');
+  if (config.debug) console.log('Initializing form', config);
 
   form.addEventListener('submit', ev => {
     ev.preventDefault();
@@ -156,13 +160,15 @@ const getFormElement = nodeOrSelector => {
 };
 
 const init = props => {
-  if (!props.id) throw new Error('You must define an `id` property');
-  if (!props.element) throw new Error('You must define an `element` property');
+  if (!props.id && !(props.site && props.form))
+    throw new Error('You must set an `id` or `site` & `form` properties');
+  if (!props.element) throw new Error('You must set an `element` property');
 
+  const key = props.form;
   const form = getFormElement(props.element);
   if (!form) throw new Error(`Element \`${props.element}\` not found`);
 
-  const config = objectAssign({}, defaults, props, { form });
+  const config = objectAssign({}, defaults, props, { form, key });
   return setup(config);
 };
 
