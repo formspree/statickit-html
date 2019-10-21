@@ -912,9 +912,11 @@ var statickit = (function () {
   	return to;
   };
 
+  var version = "1.5.0";
+
   var serializeBody = function serializeBody(data) {
     if (data instanceof FormData) return data;
-    JSON.stringify(data);
+    return JSON.stringify(data);
   };
 
   var submissionUrl = function submissionUrl(props) {
@@ -928,6 +930,13 @@ var statickit = (function () {
     } else {
       return "".concat(endpoint, "/j/forms/").concat(id, "/submissions");
     }
+  };
+
+  var clientHeader = function clientHeader(_ref) {
+    var clientName = _ref.clientName;
+    var label = "@statickit/core@".concat(version);
+    if (!clientName) return label;
+    return "".concat(clientName, " ").concat(label);
   };
   /**
    * The client constructor.
@@ -991,13 +1000,14 @@ var statickit = (function () {
     var request = {
       method: 'POST',
       mode: 'cors',
-      body: serializeBody(data)
+      body: serializeBody(data),
+      headers: {
+        'StaticKit-Client': clientHeader(props)
+      }
     };
 
     if (!(data instanceof FormData)) {
-      request.headers = {
-        'Content-Type': 'application/json'
-      };
+      request.headers['Content-Type'] = 'application/json';
     }
 
     return fetchImpl(url, request).then(function (response) {
@@ -2459,12 +2469,6 @@ var statickit = (function () {
   }
   });
 
-  var toCamel = function toCamel(s) {
-    return s.replace(/([-_][a-z])/gi, function ($1) {
-      return $1.toUpperCase().replace('-', '').replace('_', '');
-    });
-  };
-
   /*
   object-assign
   (c) Sindre Sorhus
@@ -2554,6 +2558,14 @@ var statickit = (function () {
   	return to;
   };
 
+  var toCamel = function toCamel(s) {
+    return s.replace(/([-_][a-z])/gi, function ($1) {
+      return $1.toUpperCase().replace('-', '').replace('_', '');
+    });
+  };
+
+  var version$1 = "1.1.0";
+
   var onSuccess = function onSuccess(config, _resp) {
     var h = config.h,
         form = config.form;
@@ -2637,6 +2649,7 @@ var statickit = (function () {
       site: site,
       form: key,
       endpoint: endpoint,
+      clientName: "@statickit/html@".concat(version$1),
       data: formData
     }).then(function (result) {
       if (result.response.status == 200) {

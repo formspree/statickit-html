@@ -2,6 +2,7 @@ import babel from 'rollup-plugin-babel';
 import commonjs from 'rollup-plugin-commonjs';
 import nodeResolve from 'rollup-plugin-node-resolve';
 import { terser } from 'rollup-plugin-terser';
+import json from 'rollup-plugin-json';
 
 const unbundledPlugins = [
   nodeResolve({
@@ -10,7 +11,8 @@ const unbundledPlugins = [
   commonjs(),
   babel({
     exclude: 'node_modules/**'
-  })
+  }),
+  json()
 ];
 
 const bundlePlugins = [
@@ -18,7 +20,8 @@ const bundlePlugins = [
   commonjs(),
   babel({
     exclude: 'node_modules/**'
-  })
+  }),
+  json()
 ];
 
 export default [
@@ -46,7 +49,6 @@ export default [
     plugins: unbundledPlugins,
     output: {
       format: 'cjs',
-      name: 'statickit',
       file: __dirname + '/dist/statickit.cjs.js'
     }
   },
@@ -56,7 +58,6 @@ export default [
     plugins: unbundledPlugins,
     output: {
       format: 'esm',
-      name: 'statickit',
       file: __dirname + '/dist/statickit.esm.js'
     }
   }

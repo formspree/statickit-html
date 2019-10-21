@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.2.0
+
+- Update core to fix body serialization bug.
+- Pass along `clientName` with form submission.
+
 ## 1.1.0
 
 - Accept `site` + `form` combo (in lieu of `id`) for identifying forms.

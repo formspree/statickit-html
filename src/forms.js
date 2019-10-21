@@ -1,6 +1,7 @@
 import h from 'hyperscript';
-import { toCamel } from './utils';
 import objectAssign from 'object-assign';
+import { toCamel } from './utils';
+import { version } from '../package.json';
 
 const onSuccess = (config, _resp) => {
   const { h, form } = config;
@@ -94,6 +95,7 @@ const submit = config => {
       site: site,
       form: key,
       endpoint: endpoint,
+      clientName: `@statickit/html@${version}`,
       data: formData
     })
     .then(result => {

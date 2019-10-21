@@ -1,4 +1,5 @@
 import sk from '../src';
+import { version } from '../package.json';
 
 const successClient = (data, opts) => ({
   submitForm: props => {
@@ -97,6 +98,7 @@ it('calls the success callback', () => {
       expect(props.id).toBe('xxx');
       expect(props.site).toBe('yyy');
       expect(props.form).toBe('zzz');
+      expect(props.clientName).toBe(`@statickit/html@${version}`);
     }
   });
 
