@@ -916,6 +916,19 @@ var statickit = (function () {
     if (data instanceof FormData) return data;
     JSON.stringify(data);
   };
+
+  var submissionUrl = function submissionUrl(props) {
+    var id = props.id,
+        site = props.site,
+        form = props.form;
+    var endpoint = props.endpoint || 'https://api.statickit.com';
+
+    if (site && form) {
+      return "".concat(endpoint, "/j/sites/").concat(site, "/forms/").concat(form, "/submissions");
+    } else {
+      return "".concat(endpoint, "/j/forms/").concat(id, "/submissions");
+    }
+  };
   /**
    * The client constructor.
    */
@@ -962,15 +975,14 @@ var statickit = (function () {
 
 
   StaticKit.prototype.submitForm = function submitForm(props) {
-    if (!props.id) {
-      throw new Error('You must provide an `id` for the form');
+    if (!props.id && !(props.site && props.form)) {
+      throw new Error('You must set an `id` or `site` & `form` properties');
     }
 
     var fetchImpl = props.fetchImpl || fetchBrowser({
       Promise: Promise
     }).fetch;
-    var endpoint = props.endpoint || 'https://api.statickit.com';
-    var url = "".concat(endpoint, "/j/forms/").concat(props.id, "/submissions");
+    var url = submissionUrl(props);
     var data = props.data || {};
     var session = objectAssign({}, this.session, {
       submittedAt: 1 * new Date()
