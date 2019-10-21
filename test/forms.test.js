@@ -55,11 +55,13 @@ it('fails to init if id is not given', () => {
       element: '#my-form'
     });
   } catch (e) {
-    expect(e.message).toBe('You must set an `id` or `site` & `key` properties');
+    expect(e.message).toBe(
+      'You must set an `id` or `site` & `form` properties'
+    );
   }
 });
 
-it('initializes with site and key', () => {
+it('initializes with site and form', () => {
   container.innerHTML = `
     <form id="my-form">
     </form>
@@ -68,7 +70,7 @@ it('initializes with site and key', () => {
   return new Promise(resolve => {
     sk('form', 'init', {
       site: 'yyy',
-      key: 'zzz',
+      form: 'zzz',
       element: '#my-form',
       onInit: config => {
         resolve(config);
@@ -94,7 +96,7 @@ it('calls the success callback', () => {
       // Passes all form identifying attributes
       expect(props.id).toBe('xxx');
       expect(props.site).toBe('yyy');
-      expect(props.key).toBe('zzz');
+      expect(props.form).toBe('zzz');
     }
   });
 
@@ -102,7 +104,7 @@ it('calls the success callback', () => {
     sk('form', 'init', {
       id: 'xxx',
       site: 'yyy',
-      key: 'zzz',
+      form: 'zzz',
       element: '#my-form',
       client: client,
       onSuccess: (config, response) => {

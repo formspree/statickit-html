@@ -92,7 +92,7 @@ const submit = config => {
     .submitForm({
       id: id,
       site: site,
-      key: key,
+      form: key,
       endpoint: endpoint,
       data: formData
     })
@@ -160,14 +160,15 @@ const getFormElement = nodeOrSelector => {
 };
 
 const init = props => {
-  if (!props.id && !(props.site && props.key))
-    throw new Error('You must set an `id` or `site` & `key` properties');
+  if (!props.id && !(props.site && props.form))
+    throw new Error('You must set an `id` or `site` & `form` properties');
   if (!props.element) throw new Error('You must set an `element` property');
 
+  const key = props.form;
   const form = getFormElement(props.element);
   if (!form) throw new Error(`Element \`${props.element}\` not found`);
 
-  const config = objectAssign({}, defaults, props, { form });
+  const config = objectAssign({}, defaults, props, { form, key });
   return setup(config);
 };
 

@@ -2623,7 +2623,7 @@ var statickit = (function () {
     return client.submitForm({
       id: id,
       site: site,
-      key: key,
+      form: key,
       endpoint: endpoint,
       data: formData
     }).then(function (result) {
@@ -2688,12 +2688,14 @@ var statickit = (function () {
   };
 
   var init = function init(props) {
-    if (!props.id && !(props.site && props.key)) throw new Error('You must set an `id` or `site` & `key` properties');
+    if (!props.id && !(props.site && props.form)) throw new Error('You must set an `id` or `site` & `form` properties');
     if (!props.element) throw new Error('You must set an `element` property');
+    var key = props.form;
     var form = getFormElement(props.element);
     if (!form) throw new Error("Element `".concat(props.element, "` not found"));
     var config = objectAssign$1({}, defaults, props, {
-      form: form
+      form: form,
+      key: key
     });
     return setup(config);
   };
