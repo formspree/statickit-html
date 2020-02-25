@@ -2607,6 +2607,7 @@ var statickit = (function () {
         renderErrors = config.renderErrors,
         onSubmit = config.onSubmit,
         onSuccess = config.onSuccess,
+        onFailure = config.onFailure,
         onError = config.onError,
         endpoint = config.endpoint,
         data = config.data,

@@ -63,6 +63,7 @@ const submit = config => {
     renderErrors,
     onSubmit,
     onSuccess,
+    onFailure,
     onError,
     endpoint,
     data,
