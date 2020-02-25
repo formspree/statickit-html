@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.3.0
+
+- Update core library.
+
 ## 1.2.0
 
 - Update core to fix body serialization bug.
