@@ -1,12 +1,9 @@
 # Changelog
 
-## 1.4.0
-
-- Bug fix: properly call the `onFailure` callback.
-
 ## 1.3.0
 
 - Update core library.
+- Bug fix: properly call the `onFailure` callback.
 
 ## 1.2.0
 
