@@ -2548,7 +2548,7 @@ var statickit = (function () {
     });
   };
 
-  var version$1 = "1.3.0";
+  var version$1 = "1.3.1";
 
   var onSuccess = function onSuccess(config, _resp) {
     var h = config.h,
