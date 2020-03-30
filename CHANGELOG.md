@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.3.1
+
+- Update dependencies for security.
+
 ## 1.3.0
 
 - Update core library.
